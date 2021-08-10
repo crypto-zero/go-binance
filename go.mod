@@ -1,6 +1,6 @@
-module github.com/adshao/go-binance/v2
+module github.com/crypto-zero/go-binance/v2
 
-go 1.13
+go 1.16
 
 require (
 	github.com/bitly/go-simplejson v0.5.0

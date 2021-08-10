@@ -1,9 +1,9 @@
-package futures
+package binance
 
 import (
 	"context"
 
-	"github.com/adshao/go-binance/v2/common"
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // DepthService show depth info
@@ -29,7 +29,7 @@ func (s *DepthService) Limit(limit int) *DepthService {
 func (s *DepthService) Do(ctx context.Context, opts ...RequestOption) (res *DepthResponse, err error) {
 	r := &request{
 		method:   "GET",
-		endpoint: "/fapi/v1/depth",
+		endpoint: "/api/v3/depth",
 	}
 	r.setParam("symbol", s.symbol)
 	if s.limit != nil {

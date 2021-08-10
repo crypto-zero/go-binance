@@ -1,11 +1,11 @@
-package binance
+package delivery
 
 import (
 	"fmt"
 	"net/http"
 	"testing"
 
-	"github.com/adshao/go-binance/v2/common"
+	"github.com/crypto-zero/go-binance/v2/common"
 	"github.com/stretchr/testify/suite"
 )
 
