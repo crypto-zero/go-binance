@@ -46,9 +46,9 @@ type Account struct {
 
 // Balance define user balance of your account
 type Balance struct {
-	Asset  string `json:"asset"`
-	Free   string `json:"free"`
-	Locked string `json:"locked"`
+	Asset  string  `json:"asset"`
+	Free   float64 `json:"free,string"`
+	Locked float64 `json:"locked,string"`
 }
 
 // GetAccountSnapshotService all account orders; active, canceled, or filled

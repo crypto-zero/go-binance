@@ -63,13 +63,13 @@ func (s *accountServiceTestSuite) TestGetAccount() {
 		Balances: []Balance{
 			{
 				Asset:  "BTC",
-				Free:   "4723846.89208129",
-				Locked: "0.00000000",
+				Free:   4723846.89208129,
+				Locked: 0.00000000,
 			},
 			{
 				Asset:  "LTC",
-				Free:   "4763368.68006011",
-				Locked: "0.00000000",
+				Free:   4763368.68006011,
+				Locked: 0.00000000,
 			},
 		},
 		Permissions: []string{"SPOT"},
