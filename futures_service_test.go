@@ -22,7 +22,7 @@ func (s *futuresTransferTestSuite) TestTransfer() {
 	defer s.assertDo()
 	asset := "BTC"
 	amount := "1.000"
-	transferType := FuturesTransferTypeToFutures
+	transferType := FuturesTransferTypeSpotToFutures
 	s.assertReq(func(r *request) {
 		e := newSignedRequest().setFormParams(params{
 			"asset":  asset,
