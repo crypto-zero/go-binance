@@ -629,3 +629,8 @@ func (c *Client) NewListDustLogService() *ListDustLogService {
 func (c *Client) NewDustTransferService() *DustTransferService {
 	return &DustTransferService{c: c}
 }
+
+// NewAPIRestrictionService init api restriction service
+func (c *Client) NewAPIRestrictionService() *APIRestrictionService {
+	return &APIRestrictionService{c: c}
+}

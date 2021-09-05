@@ -173,3 +173,42 @@ type SnapshotPositions struct {
 	Symbol           string `json:"symbol"`
 	UnRealizedProfit string `json:"unRealizedProfit"`
 }
+
+// APIRestrictionService query permission from binance.
+type APIRestrictionService struct {
+	c *Client
+}
+
+// Do send request
+func (s *APIRestrictionService) Do(ctx context.Context, opts ...RequestOption) (
+	res *APIRestriction, err error) {
+	r := &request{
+		method:   "GET",
+		endpoint: "/sapi/v1/account/apiRestrictions",
+		secType:  secTypeSigned,
+	}
+	data, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = new(APIRestriction)
+	err = json.Unmarshal(data, res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type APIRestriction struct {
+	IPRestrict                     bool   `json:"ipRestrict"`
+	CreateTime                     uint64 `json:"createTime"`
+	EnableWithdrawals              bool   `json:"enableWithdrawals"`
+	EnableInternalTransfer         bool   `json:"enableInternalTransfer"`
+	PermitsUniversalTransfer       bool   `json:"permitsUniversalTransfer"`
+	EnableVanillaOptions           bool   `json:"enableVanillaOptions"`
+	EnableReading                  bool   `json:"enableReading"`
+	EnableFutures                  bool   `json:"enableFutures"`
+	EnableMargin                   bool   `json:"enableMargin"`
+	EnableSpotAndMarginTrading     bool   `json:"enableSpotAndMarginTrading"`
+	TradingAuthorityExpirationTime uint64 `json:"tradingAuthorityExpirationTime"`
+}
