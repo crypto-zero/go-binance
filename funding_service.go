@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetFundingAssetService fetches all asset detail.
@@ -43,15 +42,13 @@ func (s *GetFundingAssetService) Do(ctx context.Context) (out map[string]Funding
 		}
 		r.setFormParam("needBtcValuation", val)
 	}
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
-	out = make(map[string]FundingAsset)
+
 	var rsp []FundingAsset
-	if err = json.Unmarshal(data, &rsp); err != nil {
+	if err = s.c.callAPI(ctx, r, &rsp); err != nil {
 		return
 	}
+
+	out = make(map[string]FundingAsset)
 	for _, x := range rsp {
 		out[x.Asset] = x
 	}

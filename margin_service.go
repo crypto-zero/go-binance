@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 )
 
@@ -45,13 +44,9 @@ func (s *MarginTransferService) Do(ctx context.Context, opts ...RequestOption) (
 		"type":   s.transferType,
 	}
 	r.setFormParams(m)
+
 	res = new(TransactionResponse)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -103,13 +98,9 @@ func (s *MarginLoanService) Do(ctx context.Context, opts ...RequestOption) (res 
 	if s.isolatedSymbol != "" {
 		r.setParam("isolatedSymbol", s.isolatedSymbol)
 	}
+
 	res = new(TransactionResponse)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -156,13 +147,9 @@ func (s *MarginRepayService) Do(ctx context.Context, opts ...RequestOption) (res
 	if s.isolatedSymbol != "" {
 		r.setParam("isolatedSymbol", s.isolatedSymbol)
 	}
+
 	res = new(TransactionResponse)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -238,13 +225,9 @@ func (s *ListMarginLoansService) Do(ctx context.Context, opts ...RequestOption) 
 	if s.size != nil {
 		r.setParam("size", *s.size)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginLoanResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -334,13 +317,9 @@ func (s *ListMarginRepaysService) Do(ctx context.Context, opts ...RequestOption)
 	if s.size != nil {
 		r.setParam("size", *s.size)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginRepayResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -388,13 +367,8 @@ func (s *GetIsolatedMarginAccountService) Do(ctx context.Context, opts ...Reques
 		r.setParam("symbols", strings.Join(s.symbols, ","))
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(IsolatedMarginAccount)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -451,13 +425,9 @@ func (s *GetMarginAccountService) Do(ctx context.Context, opts ...RequestOption)
 		endpoint: "/sapi/v1/margin/account",
 		secType:  secTypeSigned,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginAccount)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -505,13 +475,9 @@ func (s *GetMarginAssetService) Do(ctx context.Context, opts ...RequestOption) (
 		secType:  secTypeAPIKey,
 	}
 	r.setParam("asset", s.asset)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginAsset)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -547,13 +513,9 @@ func (s *GetMarginPairService) Do(ctx context.Context, opts ...RequestOption) (r
 		secType:  secTypeAPIKey,
 	}
 	r.setParam("symbol", s.symbol)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginPair)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -582,14 +544,10 @@ func (s *GetMarginAllPairsService) Do(ctx context.Context, opts ...RequestOption
 		endpoint: "/sapi/v1/margin/allPairs",
 		secType:  secTypeAPIKey,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*MarginAllPair{}, err
-	}
+
 	res = make([]*MarginAllPair, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*MarginAllPair{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -625,13 +583,9 @@ func (s *GetMarginPriceIndexService) Do(ctx context.Context, opts ...RequestOpti
 		secType:  secTypeAPIKey,
 	}
 	r.setParam("symbol", s.symbol)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MarginPriceIndex)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -714,14 +668,10 @@ func (s *ListMarginTradesService) Do(ctx context.Context, opts ...RequestOption)
 	if s.isIsolated {
 		r.setParam("isIsolated", "TRUE")
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*TradeV3{}, err
-	}
+
 	res = make([]*TradeV3, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*TradeV3{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -746,13 +696,9 @@ func (s *GetMaxBorrowableService) Do(ctx context.Context, opts ...RequestOption)
 		secType:  secTypeSigned,
 	}
 	r.setParam("asset", s.asset)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MaxBorrowable)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -783,13 +729,9 @@ func (s *GetMaxTransferableService) Do(ctx context.Context, opts ...RequestOptio
 		secType:  secTypeSigned,
 	}
 	r.setParam("asset", s.asset)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(MaxTransferable)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -822,15 +764,17 @@ func (s *StartIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...R
 
 	r.setFormParam("symbol", s.symbol)
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
+	f := func(data []byte) error {
+		j, err := newJSON(data)
+		if err != nil {
+			return err
+		}
+		listenKey = j.Get("listenKey").MustString()
+		return nil
+	}
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
-	j, err := newJSON(data)
-	if err != nil {
-		return "", err
-	}
-	listenKey = j.Get("listenKey").MustString()
 	return listenKey, nil
 }
 
@@ -863,8 +807,7 @@ func (s *KeepaliveIsolatedMarginUserStreamService) Do(ctx context.Context, opts 
 	r.setFormParam("listenKey", s.listenKey)
 	r.setFormParam("symbol", s.symbol)
 
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // CloseIsolatedMarginUserStreamService delete listen key
@@ -898,8 +841,7 @@ func (s *CloseIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...R
 	r.setFormParam("listenKey", s.listenKey)
 	r.setFormParam("symbol", s.symbol)
 
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // StartMarginUserStreamService create listen key for margin user stream service
@@ -915,15 +857,17 @@ func (s *StartMarginUserStreamService) Do(ctx context.Context, opts ...RequestOp
 		secType:  secTypeAPIKey,
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
+	f := func(data []byte) error {
+		j, err := newJSON(data)
+		if err != nil {
+			return err
+		}
+		listenKey = j.Get("listenKey").MustString()
+		return nil
+	}
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
-	j, err := newJSON(data)
-	if err != nil {
-		return "", err
-	}
-	listenKey = j.Get("listenKey").MustString()
 	return listenKey, nil
 }
 
@@ -947,8 +891,7 @@ func (s *KeepaliveMarginUserStreamService) Do(ctx context.Context, opts ...Reque
 		secType:  secTypeAPIKey,
 	}
 	r.setFormParam("listenKey", s.listenKey)
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // CloseMarginUserStreamService delete listen key
@@ -972,7 +915,5 @@ func (s *CloseMarginUserStreamService) Do(ctx context.Context, opts ...RequestOp
 	}
 
 	r.setFormParam("listenKey", s.listenKey)
-
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }

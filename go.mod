@@ -8,4 +8,5 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
+	github.com/valyala/bytebufferpool v1.0.1-0.20201104193830-18533face0df
 )

@@ -16,15 +16,18 @@ func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) 
 		endpoint: "/api/v3/userDataStream",
 		secType:  secTypeAPIKey,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
+
+	f := func(data []byte) error {
+		j, err := newJSON(data)
+		if err != nil {
+			return err
+		}
+		listenKey = j.Get("listenKey").MustString()
+		return nil
+	}
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
-	j, err := newJSON(data)
-	if err != nil {
-		return "", err
-	}
-	listenKey = j.Get("listenKey").MustString()
 	return listenKey, nil
 }
 
@@ -48,8 +51,7 @@ func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOpti
 		secType:  secTypeAPIKey,
 	}
 	r.setFormParam("listenKey", s.listenKey)
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // CloseUserStreamService delete listen key
@@ -72,6 +74,5 @@ func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) 
 		secType:  secTypeAPIKey,
 	}
 	r.setFormParam("listenKey", s.listenKey)
-	_, err = s.c.callAPI(ctx, r, opts...)
-	return err
+	return s.c.callAPI(ctx, r, nil, opts...)
 }

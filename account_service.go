@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetAccountService get account info
@@ -17,13 +16,8 @@ func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res 
 		endpoint: "/api/v3/account",
 		secType:  secTypeSigned,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(Account)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -102,13 +96,8 @@ func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...RequestOptio
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return &Snapshot{}, err
-	}
 	res = new(Snapshot)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return &Snapshot{}, err
 	}
 	return res, nil
@@ -187,13 +176,8 @@ func (s *APIRestrictionService) Do(ctx context.Context, opts ...RequestOption) (
 		endpoint: "/sapi/v1/account/apiRestrictions",
 		secType:  secTypeSigned,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(APIRestriction)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

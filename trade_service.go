@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // ListTradesService list trades
@@ -65,14 +64,10 @@ func (s *ListTradesService) Do(ctx context.Context, opts ...RequestOption) (res 
 	if s.fromID != nil {
 		r.setParam("fromId", *s.fromID)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*TradeV3{}, err
-	}
+
 	res = make([]*TradeV3, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*TradeV3{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -118,13 +113,8 @@ func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption)
 		r.setParam("fromId", *s.fromID)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return
-	}
 	res = make([]*Trade, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
 		return
 	}
 	return
@@ -217,14 +207,10 @@ func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res [
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*AggTrade{}, err
-	}
+
 	res = make([]*AggTrade, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*AggTrade{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -270,14 +256,10 @@ func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (re
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Trade{}, err
-	}
+
 	res = make([]*Trade, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Trade{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }

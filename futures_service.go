@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // FuturesTransferService transfer asset between spot account and futures account
@@ -45,12 +44,7 @@ func (s *FuturesTransferService) Do(ctx context.Context, opts ...RequestOption) 
 	}
 	r.setFormParams(m)
 	res = new(TransactionResponse)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -116,13 +110,9 @@ func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...RequestOpti
 	if s.size != nil {
 		r.setParam("size", *s.size)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(FuturesTransferHistory)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err := s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

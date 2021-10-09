@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // ListDepositsService fetches deposit history.
@@ -82,13 +81,8 @@ func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error
 		r.setParam("limit", *s.limit)
 	}
 
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
 	res = make([]*Deposit, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil
@@ -141,16 +135,10 @@ func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressR
 		r.setParam("network", *s.network)
 	}
 
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return nil, err
-	}
-
 	res := &GetDepositAddressResponse{}
-	if err := json.Unmarshal(data, res); err != nil {
+	if err := s.c.callAPI(ctx, r, res); err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }
 

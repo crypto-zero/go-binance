@@ -11,7 +11,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // ListDustLogService fetch small amounts of assets exchanged versus BNB
@@ -37,7 +36,7 @@ func (s *ListDustLogService) EndTime(endTime int64) *ListDustLogService {
 }
 
 // Do sends the request.
-func (s *ListDustLogService) Do(ctx context.Context) (withdraws *DustResult, err error) {
+func (s *ListDustLogService) Do(ctx context.Context) (res *DustResult, err error) {
 	r := &request{
 		method:   "GET",
 		endpoint: "/sapi/v1/asset/dribblet",
@@ -49,13 +48,8 @@ func (s *ListDustLogService) Do(ctx context.Context) (withdraws *DustResult, err
 	if s.endTime != nil {
 		r.setParam("endTime", *s.endTime)
 	}
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
-	res := new(DustResult)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	res = new(DustResult)
+	if err = s.c.callAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil
@@ -63,17 +57,17 @@ func (s *ListDustLogService) Do(ctx context.Context) (withdraws *DustResult, err
 
 // DustResult represents the result of a DustLog API Call.
 type DustResult struct {
-	Total              uint8               `json:"total"` //Total counts of exchange
+	Total              uint8               `json:"total"` // Total counts of exchange
 	UserAssetDribblets []UserAssetDribblet `json:"userAssetDribblets"`
 }
 
 // UserAssetDribblet represents one dust log row
 type UserAssetDribblet struct {
 	OperateTime              int64                     `json:"operateTime"`
-	TotalTransferedAmount    string                    `json:"totalTransferedAmount"`    //Total transfered BNB amount for this exchange.
-	TotalServiceChargeAmount string                    `json:"totalServiceChargeAmount"` //Total service charge amount for this exchange.
+	TotalTransferedAmount    string                    `json:"totalTransferedAmount"`    // Total transfered BNB amount for this exchange.
+	TotalServiceChargeAmount string                    `json:"totalServiceChargeAmount"` // Total service charge amount for this exchange.
 	TransID                  int64                     `json:"transId"`
-	UserAssetDribbletDetails []UserAssetDribbletDetail `json:"userAssetDribbletDetails"` //Details of this exchange.
+	UserAssetDribbletDetails []UserAssetDribbletDetail `json:"userAssetDribbletDetails"` // Details of this exchange.
 }
 
 // DustLog represents one dust log informations
@@ -81,7 +75,7 @@ type UserAssetDribbletDetail struct {
 	TransID             int    `json:"transId"`
 	ServiceChargeAmount string `json:"serviceChargeAmount"`
 	Amount              string `json:"amount"`
-	OperateTime         int64  `json:"operateTime"` //The time of this exchange.
+	OperateTime         int64  `json:"operateTime"` // The time of this exchange.
 	TransferedAmount    string `json:"transferedAmount"`
 	FromAsset           string `json:"fromAsset"`
 }
@@ -109,13 +103,8 @@ func (s *DustTransferService) Do(ctx context.Context) (withdraws *DustTransferRe
 	for _, a := range s.asset {
 		r.addParam("asset", a)
 	}
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
 	res := new(DustTransferResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil

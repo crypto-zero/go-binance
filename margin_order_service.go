@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // CreateMarginOrderService create order
@@ -148,13 +147,9 @@ func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption
 		m["sideEffectType"] = *s.sideEffectType
 	}
 	r.setFormParams(m)
+
 	res = new(CreateOrderResponse)
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -221,13 +216,8 @@ func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...RequestOption
 		r.setFormParam("isIsolated", "TRUE")
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(CancelMarginOrderResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -284,13 +274,8 @@ func (s *GetMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (
 		r.setParam("isIsolated", "TRUE")
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(Order)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -329,14 +314,9 @@ func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...RequestOpt
 		r.setParam("isIsolated", "TRUE")
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Order{}, err
-	}
 	res = make([]*Order, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Order{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -412,14 +392,9 @@ func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...RequestOption)
 		r.setParam("isIsolated", "TRUE")
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Order{}, err
-	}
 	res = make([]*Order, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Order{}, err
+	if err := s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }

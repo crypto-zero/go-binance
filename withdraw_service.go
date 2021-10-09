@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // CreateWithdrawService submits a withdraw request.
@@ -69,7 +68,7 @@ func (s *CreateWithdrawService) Name(v string) *CreateWithdrawService {
 }
 
 // Do sends the request.
-func (s *CreateWithdrawService) Do(ctx context.Context) (*CreateWithdrawResponse, error) {
+func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResponse, err error) {
 	r := &request{
 		method:   "POST",
 		endpoint: "/sapi/v1/capital/withdraw/apply",
@@ -94,16 +93,10 @@ func (s *CreateWithdrawService) Do(ctx context.Context) (*CreateWithdrawResponse
 		r.setParam("name", *v)
 	}
 
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
+	res = &CreateWithdrawResponse{}
+	if err = s.c.callAPI(ctx, r, res); err != nil {
 		return nil, err
 	}
-
-	res := &CreateWithdrawResponse{}
-	if err := json.Unmarshal(data, res); err != nil {
-		return nil, err
-	}
-
 	return res, nil
 }
 
@@ -188,13 +181,9 @@ func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err err
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
+
 	res = make([]*Withdraw, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil

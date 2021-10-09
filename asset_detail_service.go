@@ -2,7 +2,6 @@ package binance
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetAssetDetailService fetches all asset detail.
@@ -29,13 +28,9 @@ func (s *GetAssetDetailService) Do(ctx context.Context) (res map[string]AssetDet
 	if s.asset != nil {
 		r.setParam("asset", *s.asset)
 	}
-	data, err := s.c.callAPI(ctx, r)
-	if err != nil {
-		return
-	}
+
 	res = make(map[string]AssetDetail)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil
