@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetPositionRiskService get account balance
@@ -27,14 +26,10 @@ func (s *GetPositionRiskService) Do(ctx context.Context, opts ...RequestOption) 
 	if s.symbol != "" {
 		r.setParam("symbol", s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*PositionRisk{}, err
-	}
+
 	res = make([]*PositionRisk, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*PositionRisk{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }

@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetPositionMarginHistoryService get position margin history service
@@ -66,13 +65,8 @@ func (s *GetPositionMarginHistoryService) Do(ctx context.Context, opts ...Reques
 		r.setParam("limit", *s.limit)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = make([]*PositionMarginHistory, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

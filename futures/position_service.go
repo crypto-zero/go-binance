@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // ChangeLeverageService change user's initial leverage of specific symbol market
@@ -35,13 +34,9 @@ func (s *ChangeLeverageService) Do(ctx context.Context, opts ...RequestOption) (
 		"symbol":   s.symbol,
 		"leverage": s.leverage,
 	})
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(SymbolLeverage)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -84,11 +79,7 @@ func (s *ChangeMarginTypeService) Do(ctx context.Context, opts ...RequestOption)
 		"symbol":     s.symbol,
 		"marginType": s.marginType,
 	})
-	_, err = s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // UpdatePositionMarginService update isolated position margin
@@ -141,11 +132,7 @@ func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...RequestOpt
 	}
 	r.setFormParams(m)
 
-	_, err = s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // ChangePositionModeService change user's position mode
@@ -174,11 +161,7 @@ func (s *ChangePositionModeService) Do(ctx context.Context, opts ...RequestOptio
 	r.setFormParams(params{
 		"dualSidePosition": s.dualSide,
 	})
-	_, err = s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // GetPositionModeService get user's position mode
@@ -199,13 +182,9 @@ func (s *GetPositionModeService) Do(ctx context.Context, opts ...RequestOption) 
 		secType:  secTypeSigned,
 	}
 	r.setFormParams(params{})
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = &PositionMode{}
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

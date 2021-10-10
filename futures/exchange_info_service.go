@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // ExchangeInfoService exchange info service
@@ -17,16 +16,11 @@ func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (re
 		endpoint: "/fapi/v1/exchangeInfo",
 		secType:  secTypeNone,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
-	res = new(ExchangeInfo)
-	err = json.Unmarshal(data, res)
-	if err != nil {
-		return nil, err
-	}
 
+	res = new(ExchangeInfo)
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+		return nil, err
+	}
 	return res, nil
 }
 

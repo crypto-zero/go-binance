@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -124,7 +123,8 @@ func (s *CreateOrderService) ClosePosition(closePosition bool) *CreateOrderServi
 	return s
 }
 
-func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, opts ...RequestOption) (data []byte, err error) {
+func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string,
+	result interface{}, opts ...RequestOption) (err error) {
 	r := &request{
 		method:   "POST",
 		endpoint: endpoint,
@@ -171,22 +171,17 @@ func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, o
 		m["closePosition"] = *s.closePosition
 	}
 	r.setFormParams(m)
-	data, err = s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []byte{}, err
+
+	if err = s.c.callAPI(ctx, r, result, opts...); err != nil {
+		return err
 	}
-	return data, nil
+	return nil
 }
 
 // Do send request
 func (s *CreateOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
-	data, err := s.createOrder(ctx, "/fapi/v1/order", opts...)
-	if err != nil {
-		return nil, err
-	}
 	res = new(CreateOrderResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.createOrder(ctx, "/fapi/v1/order", res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -239,14 +234,10 @@ func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (
 	if s.symbol != "" {
 		r.setParam("symbol", s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Order{}, err
-	}
+
 	res = make([]*Order, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Order{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -291,13 +282,9 @@ func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *O
 	if s.origClientOrderID != nil {
 		r.setParam("origClientOrderId", *s.origClientOrderID)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(Order)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -391,14 +378,10 @@ func (s *ListOrdersService) Do(ctx context.Context, opts ...RequestOption) (res 
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Order{}, err
-	}
+
 	res = make([]*Order, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Order{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -443,13 +426,9 @@ func (s *CancelOrderService) Do(ctx context.Context, opts ...RequestOption) (res
 	if s.origClientOrderID != nil {
 		r.setFormParam("origClientOrderId", *s.origClientOrderID)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(CancelOrderResponse)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -500,11 +479,7 @@ func (s *CancelAllOpenOrdersService) Do(ctx context.Context, opts ...RequestOpti
 		secType:  secTypeSigned,
 	}
 	r.setFormParam("symbol", s.symbol)
-	_, err = s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
 // CancelMultiplesOrdersService cancel a list of orders
@@ -549,14 +524,10 @@ func (s *CancelMultiplesOrdersService) Do(ctx context.Context, opts ...RequestOp
 	if s.origClientOrderIDList != nil {
 		r.setFormParam("origClientOrderIdList", s.origClientOrderIDList)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = make([]*CancelOrderResponse, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*CancelOrderResponse{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -613,14 +584,10 @@ func (s *ListLiquidationOrdersService) Do(ctx context.Context, opts ...RequestOp
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*LiquidationOrder{}, err
-	}
+
 	res = make([]*LiquidationOrder, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*LiquidationOrder{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -700,14 +667,10 @@ func (s *ListUserLiquidationOrdersService) Do(ctx context.Context, opts ...Reque
 	if s.limit != nil {
 		r.setParam("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*UserLiquidationOrder{}, err
-	}
+
 	res = make([]*UserLiquidationOrder, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*UserLiquidationOrder{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }

@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetBalanceService get account balance
@@ -17,14 +16,10 @@ func (s *GetBalanceService) Do(ctx context.Context, opts ...RequestOption) (res 
 		endpoint: "/fapi/v2/balance",
 		secType:  secTypeSigned,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*Balance{}, err
-	}
+
 	res = make([]*Balance, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*Balance{}, err
+	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -52,13 +47,9 @@ func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res 
 		endpoint: "/fapi/v1/account",
 		secType:  secTypeSigned,
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return nil, err
-	}
+
 	res = new(Account)
-	err = json.Unmarshal(data, res)
-	if err != nil {
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

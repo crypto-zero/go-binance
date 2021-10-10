@@ -2,7 +2,6 @@ package futures
 
 import (
 	"context"
-	"encoding/json"
 )
 
 // GetRebateNewUserService
@@ -39,14 +38,9 @@ func (s *GetRebateNewUserService) Do(ctx context.Context, opts ...RequestOption)
 		r.setParam("type", s.type_future)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return &RebateNewUser{}, err
-	}
-
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return &RebateNewUser{}, err
+	res = &RebateNewUser{}
+	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }

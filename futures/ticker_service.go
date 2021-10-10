@@ -28,14 +28,17 @@ func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) 
 	if s.symbol != nil {
 		r.setParam("symbol", *s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	data = common.ToJSONList(data)
-	if err != nil {
-		return []*BookTicker{}, err
-	}
+
 	res = make([]*BookTicker, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
+	f := func(data []byte) error {
+		data = common.ToJSONList(data)
+		err = json.Unmarshal(data, &res)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
 		return []*BookTicker{}, err
 	}
 	return res, nil
@@ -71,15 +74,15 @@ func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res 
 	if s.symbol != nil {
 		r.setParam("symbol", *s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return []*SymbolPrice{}, err
+
+	f := func(data []byte) error {
+		if err = json.Unmarshal(common.ToJSONList(data), &res); err != nil {
+			return err
+		}
+		return nil
 	}
-	data = common.ToJSONList(data)
-	res = make([]*SymbolPrice, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return []*SymbolPrice{}, err
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+		return nil, err
 	}
 	return res, nil
 }
@@ -111,15 +114,15 @@ func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOpt
 	if s.symbol != nil {
 		r.setParam("symbol", *s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
-	if err != nil {
-		return res, err
+
+	f := func(data []byte) error {
+		if err = json.Unmarshal(common.ToJSONList(data), &res); err != nil {
+			return err
+		}
+		return nil
 	}
-	data = common.ToJSONList(data)
-	res = make([]*PriceChangeStats, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return nil, err
+	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+		return res, err
 	}
 	return res, nil
 }
