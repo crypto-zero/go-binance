@@ -7,13 +7,12 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
-
-	"github.com/valyala/bytebufferpool"
 
 	"github.com/bitly/go-simplejson"
 	"github.com/crypto-zero/go-binance/v2/common"
@@ -291,7 +290,8 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 }
 
 func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
-	opts ...RequestOption) (err error) {
+	opts ...RequestOption,
+) (err error) {
 	err = c.parseRequest(r, opts...)
 	if err != nil {
 		return err
@@ -312,9 +312,7 @@ func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
 		return err
 	}
 
-	b := bytebufferpool.Get()
-	defer bytebufferpool.Put(b)
-	_, err = b.ReadFrom(res.Body)
+	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
@@ -330,13 +328,13 @@ func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
 
 	if c.Debug {
 		c.debug("response: %#v", res)
-		c.debug("response body: %s", string(b.B))
+		c.debug("response body: %s", string(data))
 		c.debug("response status code: %d", res.StatusCode)
 	}
 
 	if res.StatusCode >= 400 {
 		apiErr := new(common.APIError)
-		e := json.Unmarshal(b.B, apiErr)
+		e := json.Unmarshal(data, apiErr)
 		if e != nil && c.Debug {
 			c.debug("failed to unmarshal json: %s", e)
 		}
@@ -346,12 +344,12 @@ func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
 	if result != nil {
 		f, ok := result.(func(data []byte) error)
 		if ok {
-			if err = f(b.B); err != nil {
+			if err = f(data); err != nil {
 				return err
 			}
 			return nil
 		}
-		if err = json.Unmarshal(b.B, result); err != nil {
+		if err = json.Unmarshal(data, result); err != nil {
 			return err
 		}
 	}
