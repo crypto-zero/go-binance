@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// CreateWithdrawService submits a withdraw request.
+// CreateWithdrawService submits a withdraw Request.
 //
 // See https://binance-docs.github.io/apidocs/spot/en/#withdraw
 type CreateWithdrawService struct {
@@ -67,30 +67,30 @@ func (s *CreateWithdrawService) Name(v string) *CreateWithdrawService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/capital/withdraw/apply",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("coin", s.coin)
-	r.setParam("address", s.address)
-	r.setParam("amount", s.amount)
+	r.SetQuery("coin", s.coin)
+	r.SetQuery("address", s.address)
+	r.SetQuery("amount", s.amount)
 	if v := s.withdrawOrderID; v != nil {
-		r.setParam("withdrawOrderId", *v)
+		r.SetQuery("withdrawOrderId", *v)
 	}
 	if v := s.network; v != nil {
-		r.setParam("network", *v)
+		r.SetQuery("network", *v)
 	}
 	if v := s.addressTag; v != nil {
-		r.setParam("addressTag", *v)
+		r.SetQuery("addressTag", *v)
 	}
 	if v := s.transactionFeeFlag; v != nil {
-		r.setParam("transactionFeeFlag", *v)
+		r.SetQuery("transactionFeeFlag", *v)
 	}
 	if v := s.name; v != nil {
-		r.setParam("name", *v)
+		r.SetQuery("name", *v)
 	}
 
 	res = &CreateWithdrawResponse{}
@@ -156,30 +156,30 @@ func (s *ListWithdrawsService) Limit(limit int) *ListWithdrawsService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/capital/withdraw/history",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	if s.coin != nil {
-		r.setParam("coin", *s.coin)
+		r.SetQuery("coin", *s.coin)
 	}
 	if s.status != nil {
-		r.setParam("status", *s.status)
+		r.SetQuery("status", *s.status)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.offset != nil {
-		r.setParam("offset", *s.offset)
+		r.SetQuery("offset", *s.offset)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*Withdraw, 0)

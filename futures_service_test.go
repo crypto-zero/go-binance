@@ -23,8 +23,8 @@ func (s *futuresTransferTestSuite) TestTransfer() {
 	asset := "BTC"
 	amount := "1.000"
 	transferType := FuturesTransferTypeSpotToFutures
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"asset":  asset,
 			"amount": amount,
 			"type":   transferType,
@@ -62,8 +62,8 @@ func (s *futuresTransferTestSuite) TestListFuturesTransfer() {
 	defer s.assertDo()
 	asset := "USDT"
 	startTime := int64(1555056425000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"asset":     asset,
 			"startTime": startTime,
 		})

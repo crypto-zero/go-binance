@@ -43,7 +43,7 @@ func (s *accountServiceTestSuite) TestGetAccount() {
   }`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -122,8 +122,8 @@ func (s *accountServiceTestSuite) TestGetAccountSnapshot() {
 	startTime := int64(1498793709153)
 	endTime := int64(1498793709156)
 	limit := 1
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"type":      accountType,
 			"startTime": startTime,
 			"endTime":   endTime,
@@ -140,13 +140,13 @@ func (s *accountServiceTestSuite) TestGetAccountSnapshot() {
 		Code: 200,
 		Msg:  "",
 		Snapshot: []*SnapshotVos{
-			&SnapshotVos{
+			{
 				Type:       "spot",
 				UpdateTime: 1576281599000,
 				Data: &SnapshotData{
 					TotalAssetOfBtc: "0.09942700",
 					Balances: []*SnapshotBalances{
-						&SnapshotBalances{
+						{
 							Asset:  "BTC",
 							Free:   "0.09905021",
 							Locked: "0.00000000",

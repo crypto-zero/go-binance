@@ -100,14 +100,14 @@ func (s *CreateMarginOrderService) SideEffectType(sideEffectType SideEffectType)
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	m := params{
+	m := Params{
 		"symbol": s.symbol,
 		"side":   s.side,
 		"type":   s.orderType,
@@ -146,7 +146,7 @@ func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption
 	if s.sideEffectType != nil {
 		m["sideEffectType"] = *s.sideEffectType
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
 	res = new(CreateOrderResponse)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -195,25 +195,25 @@ func (s *CancelMarginOrderService) NewClientOrderID(newClientOrderID string) *Ca
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelMarginOrderResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "DELETE",
 		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setFormParam("symbol", s.symbol)
+	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setFormParam("orderId", *s.orderID)
+		r.SetForm("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setFormParam("origClientOrderId", *s.origClientOrderID)
+		r.SetForm("origClientOrderId", *s.origClientOrderID)
 	}
 	if s.newClientOrderID != nil {
-		r.setFormParam("newClientOrderId", *s.newClientOrderID)
+		r.SetForm("newClientOrderId", *s.newClientOrderID)
 	}
 	if s.isIsolated {
-		r.setFormParam("isIsolated", "TRUE")
+		r.SetForm("isIsolated", "TRUE")
 	}
 
 	res = new(CancelMarginOrderResponse)
@@ -256,22 +256,22 @@ func (s *GetMarginOrderService) OrigClientOrderID(origClientOrderID string) *Get
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setParam("origClientOrderId", *s.origClientOrderID)
+		r.SetQuery("origClientOrderId", *s.origClientOrderID)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = new(Order)
@@ -300,18 +300,18 @@ func (s *ListMarginOpenOrdersService) IsIsolated(isIsolated bool) *ListMarginOpe
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/openOrders",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = make([]*Order, 0)
@@ -368,28 +368,28 @@ func (s *ListMarginOrdersService) Limit(limit int) *ListMarginOrdersService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/allOrders",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = make([]*Order, 0)

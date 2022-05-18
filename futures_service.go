@@ -30,19 +30,19 @@ func (s *FuturesTransferService) Type(transferType FuturesTransferType) *Futures
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *FuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/futures/transfer",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	m := params{
+	m := Params{
 		"asset":  s.asset,
 		"amount": s.amount,
 		"type":   s.transferType,
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 	res = new(TransactionResponse)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
@@ -90,25 +90,25 @@ func (s *ListFuturesTransferService) Size(size int64) *ListFuturesTransferServic
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *FuturesTransferHistory, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/futures/transfer",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParams(params{
+	r.SetQueryParams(Params{
 		"asset":     s.asset,
 		"startTime": s.startTime,
 	})
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.current != nil {
-		r.setParam("current", *s.current)
+		r.SetQuery("current", *s.current)
 	}
 	if s.size != nil {
-		r.setParam("size", *s.size)
+		r.SetQuery("size", *s.size)
 	}
 
 	res = new(FuturesTransferHistory)

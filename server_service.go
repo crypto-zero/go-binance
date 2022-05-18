@@ -9,9 +9,9 @@ type PingService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *PingService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/ping",
 	}
@@ -23,9 +23,9 @@ type ServerTimeService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *ServerTimeService) Do(ctx context.Context, opts ...RequestOption) (serverTime int64, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/time",
 	}
@@ -49,7 +49,7 @@ type SetServerTimeService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *SetServerTimeService) Do(ctx context.Context, opts ...RequestOption) (timeOffset int64, err error) {
 	serverTime, err := s.c.NewServerTimeService().Do(ctx)
 	if err != nil {

@@ -31,19 +31,19 @@ func (s *MarginTransferService) Type(transferType MarginTransferType) *MarginTra
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *MarginTransferService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/margin/transfer",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	m := params{
+	m := Params{
 		"asset":  s.asset,
 		"amount": s.amount,
 		"type":   s.transferType,
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
 	res = new(TransactionResponse)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -83,20 +83,20 @@ func (s *MarginLoanService) IsolatedSymbol(isolatedSymbol string) *MarginLoanSer
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *MarginLoanService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/margin/loan",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	m := params{
+	m := Params{
 		"asset":  s.asset,
 		"amount": s.amount,
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 	if s.isolatedSymbol != "" {
-		r.setParam("isolatedSymbol", s.isolatedSymbol)
+		r.SetQuery("isolatedSymbol", s.isolatedSymbol)
 	}
 
 	res = new(TransactionResponse)
@@ -132,20 +132,20 @@ func (s *MarginRepayService) IsolatedSymbol(isolatedSymbol string) *MarginRepayS
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *MarginRepayService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/margin/repay",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	m := params{
+	m := Params{
 		"asset":  s.asset,
 		"amount": s.amount,
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 	if s.isolatedSymbol != "" {
-		r.setParam("isolatedSymbol", s.isolatedSymbol)
+		r.SetQuery("isolatedSymbol", s.isolatedSymbol)
 	}
 
 	res = new(TransactionResponse)
@@ -202,28 +202,28 @@ func (s *ListMarginLoansService) Size(size int64) *ListMarginLoansService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListMarginLoansService) Do(ctx context.Context, opts ...RequestOption) (res *MarginLoanResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/loan",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("asset", s.asset)
+	r.SetQuery("asset", s.asset)
 	if s.txID != nil {
-		r.setParam("txId", *s.txID)
+		r.SetQuery("txId", *s.txID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.current != nil {
-		r.setParam("current", *s.current)
+		r.SetQuery("current", *s.current)
 	}
 	if s.size != nil {
-		r.setParam("size", *s.size)
+		r.SetQuery("size", *s.size)
 	}
 
 	res = new(MarginLoanResponse)
@@ -294,28 +294,28 @@ func (s *ListMarginRepaysService) Size(size int64) *ListMarginRepaysService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListMarginRepaysService) Do(ctx context.Context, opts ...RequestOption) (res *MarginRepayResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/repay",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("asset", s.asset)
+	r.SetQuery("asset", s.asset)
 	if s.txID != nil {
-		r.setParam("txId", *s.txID)
+		r.SetQuery("txId", *s.txID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.current != nil {
-		r.setParam("current", *s.current)
+		r.SetQuery("current", *s.current)
 	}
 	if s.size != nil {
-		r.setParam("size", *s.size)
+		r.SetQuery("size", *s.size)
 	}
 
 	res = new(MarginRepayResponse)
@@ -355,16 +355,16 @@ func (s *GetIsolatedMarginAccountService) Symbols(symbols ...string) *GetIsolate
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetIsolatedMarginAccountService) Do(ctx context.Context, opts ...RequestOption) (res *IsolatedMarginAccount, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/isolated/account",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 
 	if len(s.symbols) > 0 {
-		r.setParam("symbols", strings.Join(s.symbols, ","))
+		r.SetQuery("symbols", strings.Join(s.symbols, ","))
 	}
 
 	res = new(IsolatedMarginAccount)
@@ -418,12 +418,12 @@ type GetMarginAccountService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginAccountService) Do(ctx context.Context, opts ...RequestOption) (res *MarginAccount, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/account",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 
 	res = new(MarginAccount)
@@ -467,14 +467,14 @@ func (s *GetMarginAssetService) Asset(asset string) *GetMarginAssetService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginAssetService) Do(ctx context.Context, opts ...RequestOption) (res *MarginAsset, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/asset",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setParam("asset", s.asset)
+	r.SetQuery("asset", s.asset)
 
 	res = new(MarginAsset)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -505,14 +505,14 @@ func (s *GetMarginPairService) Symbol(symbol string) *GetMarginPairService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginPairService) Do(ctx context.Context, opts ...RequestOption) (res *MarginPair, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/pair",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 
 	res = new(MarginPair)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -537,12 +537,12 @@ type GetMarginAllPairsService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginAllPairsService) Do(ctx context.Context, opts ...RequestOption) (res []*MarginAllPair, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/allPairs",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
 	res = make([]*MarginAllPair, 0)
@@ -575,14 +575,14 @@ func (s *GetMarginPriceIndexService) Symbol(symbol string) *GetMarginPriceIndexS
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMarginPriceIndexService) Do(ctx context.Context, opts ...RequestOption) (res *MarginPriceIndex, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/priceIndex",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 
 	res = new(MarginPriceIndex)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -645,28 +645,28 @@ func (s *ListMarginTradesService) FromID(fromID int64) *ListMarginTradesService 
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListMarginTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/myTrades",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = make([]*TradeV3, 0)
@@ -688,14 +688,14 @@ func (s *GetMaxBorrowableService) Asset(asset string) *GetMaxBorrowableService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMaxBorrowableService) Do(ctx context.Context, opts ...RequestOption) (res *MaxBorrowable, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/maxBorrowable",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("asset", s.asset)
+	r.SetQuery("asset", s.asset)
 
 	res = new(MaxBorrowable)
 	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
@@ -721,14 +721,14 @@ func (s *GetMaxTransferableService) Asset(asset string) *GetMaxTransferableServi
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetMaxTransferableService) Do(ctx context.Context, opts ...RequestOption) (res *MaxTransferable, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/margin/maxTransferable",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("asset", s.asset)
+	r.SetQuery("asset", s.asset)
 
 	res = new(MaxTransferable)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -754,15 +754,15 @@ func (s *StartIsolatedMarginUserStreamService) Symbol(symbol string) *StartIsola
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *StartIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/userDataStream/isolated",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
-	r.setFormParam("symbol", s.symbol)
+	r.SetForm("symbol", s.symbol)
 
 	f := func(data []byte) error {
 		j, err := newJSON(data)
@@ -785,7 +785,7 @@ type KeepaliveIsolatedMarginUserStreamService struct {
 	symbol    string
 }
 
-// Symbol set symbol to the isolated margin keepalive request
+// Symbol set symbol to the isolated margin keepalive Request
 func (s *KeepaliveIsolatedMarginUserStreamService) Symbol(symbol string) *KeepaliveIsolatedMarginUserStreamService {
 	s.symbol = symbol
 	return s
@@ -797,15 +797,15 @@ func (s *KeepaliveIsolatedMarginUserStreamService) ListenKey(listenKey string) *
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *KeepaliveIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "PUT",
 		endpoint: "/sapi/v1/userDataStream/isolated",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setFormParam("listenKey", s.listenKey)
-	r.setFormParam("symbol", s.symbol)
+	r.SetForm("listenKey", s.listenKey)
+	r.SetForm("symbol", s.symbol)
 
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
@@ -824,22 +824,22 @@ func (s *CloseIsolatedMarginUserStreamService) ListenKey(listenKey string) *Clos
 	return s
 }
 
-// Symbol set symbol to the isolated margin user stream close request
+// Symbol set symbol to the isolated margin user stream close Request
 func (s *CloseIsolatedMarginUserStreamService) Symbol(symbol string) *CloseIsolatedMarginUserStreamService {
 	s.symbol = symbol
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *CloseIsolatedMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "DELETE",
 		endpoint: "/sapi/v1/userDataStream/isolated",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
-	r.setFormParam("listenKey", s.listenKey)
-	r.setFormParam("symbol", s.symbol)
+	r.SetForm("listenKey", s.listenKey)
+	r.SetForm("symbol", s.symbol)
 
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
@@ -849,12 +849,12 @@ type StartMarginUserStreamService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *StartMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
 	f := func(data []byte) error {
@@ -883,14 +883,14 @@ func (s *KeepaliveMarginUserStreamService) ListenKey(listenKey string) *Keepaliv
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *KeepaliveMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "PUT",
 		endpoint: "/sapi/v1/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setFormParam("listenKey", s.listenKey)
+	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
@@ -906,14 +906,14 @@ func (s *CloseMarginUserStreamService) ListenKey(listenKey string) *CloseMarginU
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *CloseMarginUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "DELETE",
 		endpoint: "/sapi/v1/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
-	r.setFormParam("listenKey", s.listenKey)
+	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }

@@ -9,12 +9,12 @@ type GetAccountService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res *Account, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/account",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	res = new(Account)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -78,23 +78,23 @@ func (s *GetAccountSnapshotService) Limit(limit int) *GetAccountSnapshotService 
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...RequestOption) (res *Snapshot, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/accountSnapshot",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("type", s.accountType)
+	r.SetQuery("type", s.accountType)
 
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	res = new(Snapshot)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -168,13 +168,14 @@ type APIRestrictionService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *APIRestrictionService) Do(ctx context.Context, opts ...RequestOption) (
-	res *APIRestriction, err error) {
-	r := &request{
+	res *APIRestriction, err error,
+) {
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/account/apiRestrictions",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	res = new(APIRestriction)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {

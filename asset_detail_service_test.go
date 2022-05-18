@@ -34,7 +34,7 @@ func (s *withdrawServiceTestSuite) TestGetAssetDetail() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})

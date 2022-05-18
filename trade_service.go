@@ -44,25 +44,25 @@ func (s *ListTradesService) FromID(fromID int64) *ListTradesService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/myTrades",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 
 	res = make([]*TradeV3, 0)
@@ -98,19 +98,19 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/historicalTrades",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 
 	res = make([]*Trade, 0)
@@ -188,24 +188,24 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*AggTrade, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/aggTrades",
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*AggTrade, 0)
@@ -246,15 +246,15 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v1/trades",
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*Trade, 0)

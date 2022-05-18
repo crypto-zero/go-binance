@@ -29,6 +29,10 @@ func NewDefaultLogger(level LogLevel, p Printf) *DefaultLogger {
 	return &DefaultLogger{level: level, p: p}
 }
 
+func (d *DefaultLogger) SetLevel(level LogLevel) {
+	d.level = level
+}
+
 func (d *DefaultLogger) levelEnable(level LogLevel) bool {
 	return level >= d.level
 }

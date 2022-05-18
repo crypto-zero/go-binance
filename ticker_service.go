@@ -19,14 +19,14 @@ func (s *ListBookTickersService) Symbol(symbol string) *ListBookTickersService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) (res []*BookTicker, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/ticker/bookTicker",
 	}
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -64,14 +64,14 @@ func (s *ListPricesService) Symbol(symbol string) *ListPricesService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res []*SymbolPrice, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/ticker/price",
 	}
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -106,14 +106,14 @@ func (s *ListPriceChangeStatsService) Symbol(symbol string) *ListPriceChangeStat
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOption) (res []*PriceChangeStats, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/ticker/24hr",
 	}
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -165,13 +165,13 @@ func (s *AveragePriceService) Symbol(symbol string) *AveragePriceService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *AveragePriceService) Do(ctx context.Context, opts ...RequestOption) (res *AvgPrice, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/avgPrice",
 	}
-	r.setParam("symbol", s.symbol)
+	r.SetQuery("symbol", s.symbol)
 
 	res = new(AvgPrice)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {

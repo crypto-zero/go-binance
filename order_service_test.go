@@ -43,8 +43,8 @@ func (s *orderServiceTestSuite) TestCreateOrder() {
 	quoteOrderQty := "10.00"
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -117,8 +117,8 @@ func (s *orderServiceTestSuite) TestCreateOrderFull() {
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
 	newOrderRespType := NewOrderRespTypeFULL
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -150,7 +150,7 @@ func (s *orderServiceTestSuite) TestCreateOrderFull() {
 		Type:                     OrderTypeLimit,
 		Side:                     SideTypeBuy,
 		Fills: []*Fill{
-			&Fill{
+			{
 				Price:           "0.00002991",
 				Quantity:        "344.00000000",
 				Commission:      "0.00332384",
@@ -262,8 +262,8 @@ func (s *orderServiceTestSuite) TestCreateOCO() {
 	stopLimitPrice := "3.2"
 	limitClientOrderID := "myOrder1"
 	newOrderRespType := NewOrderRespTypeFULL
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":               symbol,
 			"side":                 side,
 			"quantity":             quantity,
@@ -298,19 +298,19 @@ func (s *orderServiceTestSuite) TestCreateOCO() {
 		TransactionTime:   1574040868128,
 		Symbol:            "LTCBTC",
 		Orders: []*OCOOrder{
-			&OCOOrder{
+			{
 				Symbol:        "LTCBTC",
 				OrderID:       2,
 				ClientOrderID: "pO9ufTiFGg3nw2fOdgeOXa",
 			},
-			&OCOOrder{
+			{
 				Symbol:        "LTCBTC",
 				OrderID:       3,
 				ClientOrderID: "TXOvglzXuaubXAaENpaRCB",
 			},
 		},
 		OrderReports: []*OCOOrderReport{
-			&OCOOrderReport{
+			{
 				Symbol:                   "LTCBTC",
 				OrderID:                  2,
 				OrderListID:              0,
@@ -325,7 +325,7 @@ func (s *orderServiceTestSuite) TestCreateOCO() {
 				Side:                     SideTypeSell,
 				StopPrice:                "1.00000000",
 			},
-			&OCOOrderReport{
+			{
 				Symbol:                   "LTCBTC",
 				OrderID:                  3,
 				OrderListID:              0,
@@ -413,8 +413,8 @@ func (s *orderServiceTestSuite) TestListOpenOrders() {
 
 	symbol := "LTCBTC"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":     symbol,
 			"recvWindow": recvWindow,
 		})
@@ -490,8 +490,8 @@ func (s *orderServiceTestSuite) TestGetOrder() {
 	symbol := "LTCBTC"
 	orderID := int64(1)
 	origClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -550,8 +550,8 @@ func (s *orderServiceTestSuite) TestListOrders() {
 	limit := 3
 	startTime := int64(1499827319559)
 	endTime := int64(1499827319560)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":    symbol,
 			"orderId":   orderID,
 			"startTime": startTime,
@@ -639,8 +639,8 @@ func (s *orderServiceTestSuite) TestCancelOCO() {
 
 	symbol := "BTCUSDT"
 	listClientOrderID := "my-list-order-id"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":            symbol,
 			"listClientOrderId": listClientOrderID,
 		})
@@ -726,8 +726,8 @@ func (s *orderServiceTestSuite) TestCancelOrder() {
 	orderID := int64(28)
 	origClientOrderID := "myOrder1"
 	newClientOrderID := "cancelMyOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -837,8 +837,8 @@ func (s *orderServiceTestSuite) TestCancelOpenOrders() {
 	defer s.assertDo()
 
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol": symbol,
 		})
 		s.assertRequestEqual(e, r)

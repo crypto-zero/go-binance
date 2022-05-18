@@ -23,8 +23,8 @@ func (s *marginTestSuite) TestTransfer() {
 	asset := "BTC"
 	amount := "1.000"
 	transferType := MarginTransferTypeToMargin
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"asset":  asset,
 			"amount": amount,
 			"type":   transferType,
@@ -52,8 +52,8 @@ func (s *marginTestSuite) TestLoan() {
 	defer s.assertDo()
 	asset := "BTC"
 	amount := "1.000"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"asset":  asset,
 			"amount": amount,
 		})
@@ -76,8 +76,8 @@ func (s *marginTestSuite) TestRepay() {
 	defer s.assertDo()
 	asset := "BTC"
 	amount := "1.000"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"asset":  asset,
 			"amount": amount,
 		})
@@ -112,8 +112,8 @@ func (s *marginTestSuite) TestListMarginLoans() {
 	endTime := int64(1555056425001)
 	current := int64(1)
 	size := int64(10)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"asset":     asset,
 			"txId":      txID,
 			"startTime": startTime,
@@ -181,8 +181,8 @@ func (s *marginTestSuite) TestListMarginRepays() {
 	endTime := int64(1563438204001)
 	current := int64(1)
 	size := int64(10)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"asset":     asset,
 			"txId":      txID,
 			"startTime": startTime,
@@ -279,7 +279,7 @@ func (s *marginTestSuite) TestGetMarginAccount() {
   	}`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -376,7 +376,7 @@ func (s *marginTestSuite) TestGetIsolatedMarginAccount() {
 	}`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -461,9 +461,9 @@ func (s *marginTestSuite) TestGetMarginAsset() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 	asset := "BNB"
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
-		e.setParam("asset", asset)
+		e.SetQuery("asset", asset)
 		s.assertRequestEqual(e, r)
 	})
 	res, err := s.client.NewGetMarginAssetService().Asset(asset).Do(newContext())
@@ -502,9 +502,9 @@ func (s *marginTestSuite) TestGetMarginPair() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
-		e.setParam("symbol", symbol)
+		e.SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 	res, err := s.client.NewGetMarginPairService().Symbol(symbol).Do(newContext())
@@ -553,7 +553,7 @@ func (s *marginTestSuite) TestGetMarginAllPairs() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -606,9 +606,9 @@ func (s *marginTestSuite) TestGetMarginPriceIndex() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 	symbol := "BNBBTC"
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
-		e.setParam("symbol", symbol)
+		e.SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 	res, err := s.client.NewGetMarginPriceIndexService().Symbol(symbol).Do(newContext())
@@ -662,8 +662,8 @@ func (s *marginTestSuite) TestListMarginTrades() {
 	fromID := int64(1)
 	startTime := int64(1499865549590)
 	endTime := int64(1499865549590)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":    symbol,
 			"startTime": startTime,
 			"endTime":   endTime,
@@ -719,8 +719,8 @@ func (s *marginTestSuite) TestGetMaxBorrowable() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"asset": "BNBBTC",
 		})
 		s.assertRequestEqual(e, r)
@@ -747,8 +747,8 @@ func (s *marginTestSuite) TestGetMaxTransferable() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"asset": "BNBBTC",
 		})
 		s.assertRequestEqual(e, r)
@@ -775,7 +775,7 @@ func (s *marginTestSuite) TestStartMarginUserStream() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		s.assertRequestEqual(newRequest(), r)
 	})
 
@@ -790,8 +790,8 @@ func (s *marginTestSuite) TestKeepaliveMarginUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *request) {
-		s.assertRequestEqual(newRequest().setFormParam("listenKey", listenKey), r)
+	s.assertReq(func(r *Request) {
+		s.assertRequestEqual(newRequest().SetForm("listenKey", listenKey), r)
 	})
 
 	err := s.client.NewKeepaliveMarginUserStreamService().ListenKey(listenKey).Do(newContext())
@@ -804,8 +804,8 @@ func (s *marginTestSuite) TestCloseMarginUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *request) {
-		s.assertRequestEqual(newRequest().setFormParam("listenKey", listenKey), r)
+	s.assertReq(func(r *Request) {
+		s.assertRequestEqual(newRequest().SetForm("listenKey", listenKey), r)
 	})
 
 	err := s.client.NewCloseMarginUserStreamService().ListenKey(listenKey).Do(newContext())

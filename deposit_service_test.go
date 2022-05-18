@@ -43,8 +43,8 @@ func (s *depositServiceTestSuite) TestListDeposits() {
 ]`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"coin":      "BTC",
 			"status":    1,
 			"startTime": 1508198532000,
@@ -121,8 +121,8 @@ func (s *depositServiceTestSuite) TestGetDepositAddress() {
 
 	coin := "BTC"
 	network := "BTC"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"coin":    coin,
 			"network": network,
 		})

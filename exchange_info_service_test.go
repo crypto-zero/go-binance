@@ -60,8 +60,8 @@ func (s *exchangeInfoServiceTestSuite) TestExchangeInfo() {
 	defer s.assertDo()
 	symbol := "ETHBTC"
 	symbols := []string{"ETHBTC", "LTCBTC"}
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(map[string]interface{}{
+	s.assertReq(func(r *Request) {
+		e := newRequest().SetQueryParams(map[string]interface{}{
 			"symbol":  symbol,
 			"symbols": symbols,
 		})
@@ -171,7 +171,6 @@ func (s *exchangeInfoServiceTestSuite) assertExchangeInfoEqual(e, a *ExchangeInf
 
 			return
 		}
-
 	}
 	r.Fail("Symbol ETHBTC not found")
 }

@@ -6,13 +6,14 @@ import (
 
 // APIError define API error when response status is 4xx or 5xx
 type APIError struct {
+	Status  int    `json:"status"`
 	Code    int64  `json:"code"`
 	Message string `json:"msg"`
 }
 
 // Error return error code and message
 func (e APIError) Error() string {
-	return fmt.Sprintf("<APIError> code=%d, msg=%s", e.Code, e.Message)
+	return fmt.Sprintf("<APIError> status=%d code=%d, msg=%s", e.Status, e.Code, e.Message)
 }
 
 // IsAPIError check if e is an API error

@@ -25,22 +25,22 @@ func (s *GetFundingAssetService) NeedBTCValuation(needBtcValuation bool) *GetFun
 	return s
 }
 
-// Do send the request.
+// Do send the Request.
 func (s *GetFundingAssetService) Do(ctx context.Context) (out map[string]FundingAsset, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/asset/get-funding-asset",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	if s.asset != nil {
-		r.setFormParam("asset", *s.asset)
+		r.SetForm("asset", *s.asset)
 	}
 	if s.needBtcValuation != nil {
 		val := "true"
 		if !*s.needBtcValuation {
 			val = "false"
 		}
-		r.setFormParam("needBtcValuation", val)
+		r.SetForm("needBtcValuation", val)
 	}
 
 	var rsp []FundingAsset

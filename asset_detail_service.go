@@ -18,15 +18,15 @@ func (s *GetAssetDetailService) Asset(asset string) *GetAssetDetailService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *GetAssetDetailService) Do(ctx context.Context) (res map[string]AssetDetail, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/asset/assetDetail",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	if s.asset != nil {
-		r.setParam("asset", *s.asset)
+		r.SetQuery("asset", *s.asset)
 	}
 
 	res = make(map[string]AssetDetail)

@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sync/atomic"
 	"time"
 
 	"github.com/bitly/go-simplejson"
@@ -182,7 +183,8 @@ func NewClient(apiKey, secretKey string, testnet bool) *Client {
 		BaseURL:    getAPIEndpoint(testnet),
 		UserAgent:  "Binance/golang",
 		HTTPClient: http.DefaultClient,
-		Logger:     log.New(os.Stderr, "Binance-golang ", log.LstdFlags),
+		Logger: common.NewDefaultLogger(common.LogInfo, log.New(os.Stderr,
+			"Binance-golang ", log.LstdFlags)),
 	}
 }
 
@@ -200,43 +202,40 @@ type doFunc func(req *http.Request) (*http.Response, error)
 
 // Client define API client
 type Client struct {
+	globalRequestID uint64
+
 	APIKey     string
 	SecretKey  string
 	BaseURL    string
 	UserAgent  string
 	HTTPClient *http.Client
-	Debug      bool
-	Logger     *log.Logger
+	Logger     common.Logger
 	TimeOffset int64
 	do         doFunc
 }
 
-func (c *Client) debug(format string, v ...interface{}) {
-	if c.Debug {
-		c.Logger.Printf(format, v...)
-	}
-}
-
-func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
-	// set request options from user
+func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString string, err error) {
+	// set Request options from user
 	for _, opt := range opts {
 		opt(r)
 	}
-	err = r.validate()
+	err = r.Validate()
 	if err != nil {
-		return err
+		return "", err
 	}
+
+	r.id = atomic.AddUint64(&c.globalRequestID, 1)
 
 	fullURL := fmt.Sprintf("%s%s", c.BaseURL, r.endpoint)
 	if r.recvWindow > 0 {
-		r.setParam(recvWindowKey, r.recvWindow)
+		r.SetQuery(recvWindowKey, r.recvWindow)
 	}
-	if r.secType == secTypeSigned {
-		r.setParam(timestampKey, currentTimestamp()-c.TimeOffset)
+	if r.secType == SecTypeSigned {
+		r.SetQuery(timestampKey, currentTimestamp()-c.TimeOffset)
 	}
 	queryString := r.query.Encode()
 	body := &bytes.Buffer{}
-	bodyString := r.form.Encode()
+	bodyString = r.form.Encode()
 	header := http.Header{}
 	if r.header != nil {
 		header = r.header.Clone()
@@ -245,16 +244,16 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 		header.Set("Content-Type", "application/x-www-form-urlencoded")
 		body = bytes.NewBufferString(bodyString)
 	}
-	if r.secType == secTypeAPIKey || r.secType == secTypeSigned {
+	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
 		header.Set("X-MBX-APIKEY", c.APIKey)
 	}
 
-	if r.secType == secTypeSigned {
+	if r.secType == SecTypeSigned {
 		raw := fmt.Sprintf("%s%s", queryString, bodyString)
 		mac := hmac.New(sha256.New, []byte(c.SecretKey))
 		_, err = mac.Write([]byte(raw))
 		if err != nil {
-			return err
+			return "", err
 		}
 		v := url.Values{}
 		v.Set(signatureKey, fmt.Sprintf("%x", mac.Sum(nil)))
@@ -267,18 +266,17 @@ func (c *Client) parseRequest(r *request, opts ...RequestOption) (err error) {
 	if queryString != "" {
 		fullURL = fmt.Sprintf("%s?%s", fullURL, queryString)
 	}
-	c.debug("full url: %s, body: %s", fullURL, bodyString)
 
 	r.fullURL = fullURL
 	r.header = header
 	r.body = body
-	return nil
+	return bodyString, nil
 }
 
-func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
+func (c *Client) callAPI(ctx context.Context, r *Request, result interface{},
 	opts ...RequestOption,
 ) (err error) {
-	err = c.parseRequest(r, opts...)
+	bodyString, err := c.parseRequest(r, opts...)
 	if err != nil {
 		return err
 	}
@@ -291,9 +289,7 @@ func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
 	req = req.WithContext(ctx)
 	req.Header = r.header
 
-	if c.Debug {
-		c.debug("request: %#v", req)
-	}
+	c.Logger.Debugw("call api prepare", "id", r.id, "url", r.fullURL, "body", bodyString)
 
 	f := c.do
 	if f == nil {
@@ -311,25 +307,20 @@ func (c *Client) callAPI(ctx context.Context, r *request, result interface{},
 	}
 
 	defer func() {
-		cerr := res.Body.Close()
 		// Only overwrite the returned error if the original error was nil and an
 		// error occurred while closing the body.
-		if err == nil && cerr != nil {
+		if cerr := res.Body.Close(); err == nil && cerr != nil {
 			err = cerr
 		}
 	}()
 
-	if c.Debug {
-		c.debug("response: %#v", res)
-		c.debug("response body: %s", string(data))
-		c.debug("response status code: %d", res.StatusCode)
-	}
+	c.Logger.Debugw("call api reply", "id", r.id, "status_code", res.StatusCode,
+		"response_headers", res.Header, "response_body", string(data))
 
 	if res.StatusCode >= 400 {
-		apiErr := new(common.APIError)
-		e := json.Unmarshal(data, apiErr)
-		if e != nil && c.Debug {
-			c.debug("failed to unmarshal json: %s", e)
+		apiErr := &common.APIError{Status: res.StatusCode}
+		if e := json.Unmarshal(data, apiErr); e != nil {
+			c.Logger.Debugw("call api parse error failed", "id", r.id, "err", e)
 		}
 		return apiErr
 	}

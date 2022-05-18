@@ -35,18 +35,18 @@ func (s *ListDustLogService) EndTime(endTime int64) *ListDustLogService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *ListDustLogService) Do(ctx context.Context) (res *DustResult, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/sapi/v1/asset/dribblet",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	res = new(DustResult)
 	if err = s.c.callAPI(ctx, r, res); err != nil {
@@ -93,15 +93,15 @@ func (s *DustTransferService) Asset(asset []string) *DustTransferService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *DustTransferService) Do(ctx context.Context) (withdraws *DustTransferResponse, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/sapi/v1/asset/dust",
-		secType:  secTypeSigned,
+		secType:  SecTypeSigned,
 	}
 	for _, a := range s.asset {
-		r.addParam("asset", a)
+		r.AddQuery("asset", a)
 	}
 	res := new(DustTransferResponse)
 	if err = s.c.callAPI(ctx, r, res); err != nil {

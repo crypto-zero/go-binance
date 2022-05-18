@@ -39,8 +39,8 @@ func (s *marginOrderServiceTestSuite) TestCreateOrder() {
 	quoteOrderQty := "10.00"
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -110,8 +110,8 @@ func (s *marginOrderServiceTestSuite) TestCreateOrderFull() {
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
 	newOrderRespType := NewOrderRespTypeFULL
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -143,7 +143,7 @@ func (s *marginOrderServiceTestSuite) TestCreateOrderFull() {
 		Type:                     OrderTypeLimit,
 		Side:                     SideTypeBuy,
 		Fills: []*Fill{
-			&Fill{
+			{
 				Price:           "0.00002991",
 				Quantity:        "344.00000000",
 				Commission:      "0.00332384",
@@ -177,8 +177,8 @@ func (s *marginOrderServiceTestSuite) TestCancelOrder() {
 	orderID := int64(28)
 	origClientOrderID := "myOrder1"
 	newClientOrderID := "cancelMyOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetFormParams(Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -235,8 +235,8 @@ func (s *marginOrderServiceTestSuite) TestGetOrder() {
 	symbol := "LTCBTC"
 	orderID := int64(1)
 	origClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -294,8 +294,8 @@ func (s *marginOrderServiceTestSuite) TestListMarginOpenOrders() {
 
 	symbol := "BNBBTC"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":     symbol,
 			"recvWindow": recvWindow,
 		})
@@ -360,8 +360,8 @@ func (s *marginOrderServiceTestSuite) TestListMarginOrders() {
 	limit := 3
 	startTime := int64(1556089977693)
 	endTime := int64(1556163963504)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":    symbol,
 			"startTime": startTime,
 			"endTime":   endTime,

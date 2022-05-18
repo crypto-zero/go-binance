@@ -22,7 +22,7 @@ func (s *serverServiceTestSuite) TestPing() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -38,7 +38,7 @@ func (s *serverServiceTestSuite) TestServerTime() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -52,7 +52,7 @@ func (s *serverServiceTestSuite) TestServerTimeError() {
 	s.mockDo([]byte("{}"), fmt.Errorf("dummy error"), http.StatusInternalServerError)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -68,7 +68,7 @@ func (s *serverServiceTestSuite) TestServerTimeBadRequest() {
     }`), nil, http.StatusBadRequest)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -81,7 +81,7 @@ func (s *serverServiceTestSuite) TestInvalidResponseBody() {
 	s.mockDo([]byte(``), nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -95,7 +95,7 @@ func (s *serverServiceTestSuite) TestSetServerTime() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})

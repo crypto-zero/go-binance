@@ -9,12 +9,12 @@ type StartUserStreamService struct {
 	c *Client
 }
 
-// Do send request
+// Do send Request
 func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
+	r := &Request{
 		method:   "POST",
 		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
 
 	f := func(data []byte) error {
@@ -43,14 +43,14 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "PUT",
 		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setFormParam("listenKey", s.listenKey)
+	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
@@ -66,13 +66,13 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
+	r := &Request{
 		method:   "DELETE",
 		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
+		secType:  SecTypeAPIKey,
 	}
-	r.setFormParam("listenKey", s.listenKey)
+	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }

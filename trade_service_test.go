@@ -39,8 +39,8 @@ func (s *tradeServiceTestSuite) TestListTrades() {
 	fromID := int64(1)
 	startTime := int64(1499865549590)
 	endTime := int64(1499865549590)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newSignedRequest().SetQueryParams(Params{
 			"symbol":    symbol,
 			"startTime": startTime,
 			"endTime":   endTime,
@@ -94,8 +94,8 @@ func (s *tradeServiceTestSuite) TestAggregateTrades() {
 	startTime := int64(1498793709153)
 	endTime := int64(1498793709156)
 	limit := 1
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newRequest().SetQueryParams(Params{
 			"symbol":    symbol,
 			"fromId":    fromID,
 			"startTime": startTime,
@@ -153,8 +153,8 @@ func (s *tradeServiceTestSuite) TestHistoricalTrades() {
 	symbol := "LTCBTC"
 	limit := 3
 	fromID := int64(1)
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newRequest().SetQueryParams(Params{
 			"symbol": symbol,
 			"limit":  limit,
 			"fromId": fromID,
@@ -194,8 +194,8 @@ func (s *tradeServiceTestSuite) TestRecentTrades() {
 
 	symbol := "LTCBTC"
 	limit := 3
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *Request) {
+		e := newRequest().SetQueryParams(Params{
 			"symbol": symbol,
 			"limit":  limit,
 		})

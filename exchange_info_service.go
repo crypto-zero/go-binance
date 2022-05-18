@@ -23,21 +23,21 @@ func (s *ExchangeInfoService) Symbols(symbols ...string) *ExchangeInfoService {
 	return s
 }
 
-// Do send request
+// Do send Request
 func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (res *ExchangeInfo, err error) {
-	r := &request{
+	r := &Request{
 		method:   "GET",
 		endpoint: "/api/v3/exchangeInfo",
-		secType:  secTypeNone,
+		secType:  SecTypeNone,
 	}
-	m := params{}
+	m := Params{}
 	if s.symbol != "" {
 		m["symbol"] = s.symbol
 	}
 	if len(s.symbols) != 0 {
 		m["symbols"] = s.symbols
 	}
-	r.setParams(m)
+	r.SetQueryParams(m)
 
 	res = new(ExchangeInfo)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {

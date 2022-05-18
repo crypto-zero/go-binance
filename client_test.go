@@ -45,11 +45,11 @@ func (s *baseTestSuite) assertDo() {
 	s.client.AssertCalled(s.T(), "do", anyHTTPRequest())
 }
 
-func (s *baseTestSuite) assertReq(f func(r *request)) {
+func (s *baseTestSuite) assertReq(f func(r *Request)) {
 	s.client.assertReq = f
 }
 
-func (s *baseTestSuite) assertRequestEqual(e, a *request) {
+func (s *baseTestSuite) assertRequestEqual(e, a *Request) {
 	s.assertURLValuesEqual(e.query, a.query)
 	s.assertURLValuesEqual(e.form, a.form)
 }
@@ -93,22 +93,22 @@ func newHTTPResponse(data []byte, statusCode int) *http.Response {
 	}
 }
 
-func newRequest() *request {
-	r := &request{
+func newRequest() *Request {
+	r := &Request{
 		query: url.Values{},
 		form:  url.Values{},
 	}
 	return r
 }
 
-func newSignedRequest() *request {
-	return newRequest().setParams(params{
+func newSignedRequest() *Request {
+	return newRequest().SetQueryParams(Params{
 		timestampKey: "",
 		signatureKey: "",
 	})
 }
 
-type assertReqFunc func(r *request)
+type assertReqFunc func(r *Request)
 
 type mockedClient struct {
 	mock.Mock
