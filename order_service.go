@@ -92,11 +92,7 @@ func (s *CreateOrderService) NewOrderRespType(newOrderRespType NewOrderRespType)
 func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, result interface{},
 	opts ...common.RequestOption,
 ) (err error) {
-	r := &common.Request{
-		Method:   "POST",
-		Endpoint: endpoint,
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewPostRequestSigned(endpoint)
 	m := common.Params{
 		"symbol": s.symbol,
 		"side":   s.side,
@@ -278,11 +274,7 @@ func (s *CreateOCOService) NewOrderRespType(newOrderRespType NewOrderRespType) *
 func (s *CreateOCOService) createOrder(ctx context.Context, endpoint string, result interface{},
 	opts ...common.RequestOption,
 ) (err error) {
-	r := &common.Request{
-		Method:   "POST",
-		Endpoint: endpoint,
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewPostRequestSigned(endpoint)
 	m := common.Params{
 		"symbol":    s.symbol,
 		"side":      s.side,
@@ -386,11 +378,7 @@ func (s *ListOpenOrdersService) Symbol(symbol string) *ListOpenOrdersService {
 
 // Do send Request
 func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/openOrders",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/api/v3/openOrders")
 	if s.symbol != "" {
 		r.SetQuery("symbol", s.symbol)
 	}
@@ -430,11 +418,7 @@ func (s *GetOrderService) OrigClientOrderID(origClientOrderID string) *GetOrderS
 
 // Do send Request
 func (s *GetOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *Order, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/order",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/api/v3/order")
 	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
 		r.SetQuery("orderId", *s.orderID)
@@ -513,11 +497,7 @@ func (s *ListOrdersService) Limit(limit int) *ListOrdersService {
 
 // Do send Request
 func (s *ListOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/allOrders",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/api/v3/allOrders")
 	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
 		r.SetQuery("orderId", *s.orderID)
@@ -574,11 +554,7 @@ func (s *CancelOrderService) NewClientOrderID(newClientOrderID string) *CancelOr
 
 // Do send Request
 func (s *CancelOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOrderResponse, err error) {
-	r := &common.Request{
-		Method:   "DELETE",
-		Endpoint: "/api/v3/order",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewDeleteRequestSigned("/api/v3/order")
 	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
 		r.SetForm("orderId", *s.orderID)
@@ -632,11 +608,7 @@ func (s *CancelOCOService) NewClientOrderID(newClientOrderID string) *CancelOCOS
 
 // Do send Request
 func (s *CancelOCOService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOCOResponse, err error) {
-	r := &common.Request{
-		Method:   "DELETE",
-		Endpoint: "/api/v3/orderList",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewDeleteRequestSigned("/api/v3/orderList")
 	r.SetForm("symbol", s.symbol)
 	if s.listClientOrderID != "" {
 		r.SetForm("listClientOrderId", s.listClientOrderID)
@@ -669,11 +641,7 @@ func (s *CancelOpenOrdersService) Symbol(symbol string) *CancelOpenOrdersService
 
 // Do send Request
 func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOpenOrdersResponse, err error) {
-	r := &common.Request{
-		Method:   "DELETE",
-		Endpoint: "/api/v3/openOrders",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewDeleteRequestSigned("/api/v3/openOrders")
 	r.SetQuery("symbol", s.symbol)
 
 	rawMessages := make([]*json.RawMessage, 0)

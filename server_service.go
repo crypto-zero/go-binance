@@ -13,10 +13,7 @@ type PingService struct {
 
 // Do send Request
 func (s *PingService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/ping",
-	}
+	r := common.NewGetRequestPublic("/api/v3/ping")
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
 
@@ -27,11 +24,7 @@ type ServerTimeService struct {
 
 // Do send Request
 func (s *ServerTimeService) Do(ctx context.Context, opts ...common.RequestOption) (serverTime int64, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/time",
-	}
-
+	r := common.NewGetRequestPublic("/api/v3/time")
 	f := func(data []byte) error {
 		j, err := newJSON(data)
 		if err != nil {

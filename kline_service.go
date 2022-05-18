@@ -49,10 +49,7 @@ func (s *KlinesService) EndTime(endTime int64) *KlinesService {
 
 // Do send Request
 func (s *KlinesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Kline, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/klines",
-	}
+	r := common.NewGetRequestPublic("/api/v3/klines")
 	r.SetQuery("symbol", s.symbol)
 	r.SetQuery("interval", s.interval)
 	if s.limit != nil {

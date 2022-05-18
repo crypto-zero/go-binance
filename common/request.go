@@ -114,3 +114,59 @@ func WithHeaders(header http.Header) RequestOption {
 		r.Header = header.Clone()
 	}
 }
+
+func NewRequest(method, endpoint string, secType SecType) *Request {
+	return &Request{
+		Method:   method,
+		Endpoint: endpoint,
+		SecType:  secType,
+	}
+}
+
+func NewGetRequest(endpoint string, secType SecType) *Request {
+	return NewRequest(http.MethodGet, endpoint, secType)
+}
+
+func NewGetRequestPublic(endpoint string) *Request {
+	return NewGetRequest(endpoint, SecTypeNone)
+}
+
+func NewGetRequestAPIKey(endpoint string) *Request {
+	return NewGetRequest(endpoint, SecTypeAPIKey)
+}
+
+func NewGetRequestSigned(endpoint string) *Request {
+	return NewGetRequest(endpoint, SecTypeSigned)
+}
+
+func NewPostRequest(endpoint string, secType SecType) *Request {
+	return NewRequest(http.MethodPost, endpoint, secType)
+}
+
+func NewPostRequestSigned(endpoint string) *Request {
+	return NewPostRequest(endpoint, SecTypeSigned)
+}
+
+func NewPostRequestAPIKey(endpoint string) *Request {
+	return NewPostRequest(endpoint, SecTypeAPIKey)
+}
+
+func NewPutRequest(endpoint string, secType SecType) *Request {
+	return NewRequest(http.MethodPut, endpoint, secType)
+}
+
+func NewPutRequestAPIKey(endpoint string) *Request {
+	return NewPutRequest(endpoint, SecTypeAPIKey)
+}
+
+func NewDeleteRequest(endpoint string, secType SecType) *Request {
+	return NewRequest(http.MethodDelete, endpoint, secType)
+}
+
+func NewDeleteRequestAPIKey(endpoint string) *Request {
+	return NewDeleteRequest(endpoint, SecTypeAPIKey)
+}
+
+func NewDeleteRequestSigned(endpoint string) *Request {
+	return NewDeleteRequest(endpoint, SecTypeSigned)
+}

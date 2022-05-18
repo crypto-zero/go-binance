@@ -13,11 +13,7 @@ type GetAccountService struct {
 
 // Do send Request
 func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/account",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/api/v3/account")
 	res = new(Account)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
@@ -82,11 +78,7 @@ func (s *GetAccountSnapshotService) Limit(limit int) *GetAccountSnapshotService 
 
 // Do send Request
 func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...common.RequestOption) (res *Snapshot, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/sapi/v1/accountSnapshot",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/sapi/v1/accountSnapshot")
 	r.SetQuery("type", s.accountType)
 
 	if s.startTime != nil {
@@ -174,11 +166,7 @@ type APIRestrictionService struct {
 func (s *APIRestrictionService) Do(ctx context.Context, opts ...common.RequestOption) (
 	res *APIRestriction, err error,
 ) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/sapi/v1/account/apiRestrictions",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/sapi/v1/account/apiRestrictions")
 	res = new(APIRestriction)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
 		return nil, err

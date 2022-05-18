@@ -27,11 +27,7 @@ func (s *ExchangeInfoService) Symbols(symbols ...string) *ExchangeInfoService {
 
 // Do send Request
 func (s *ExchangeInfoService) Do(ctx context.Context, opts ...common.RequestOption) (res *ExchangeInfo, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/exchangeInfo",
-		SecType:  common.SecTypeNone,
-	}
+	r := common.NewGetRequestPublic("/api/v3/exchangeInfo")
 	m := common.Params{}
 	if s.symbol != "" {
 		m["symbol"] = s.symbol

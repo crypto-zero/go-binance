@@ -71,11 +71,7 @@ func (s *CreateWithdrawService) Name(v string) *CreateWithdrawService {
 
 // Do sends the Request.
 func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResponse, err error) {
-	r := &common.Request{
-		Method:   "POST",
-		Endpoint: "/sapi/v1/capital/withdraw/apply",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewPostRequestSigned("/sapi/v1/capital/withdraw/apply")
 	r.SetQuery("coin", s.coin)
 	r.SetQuery("address", s.address)
 	r.SetQuery("amount", s.amount)
@@ -160,11 +156,7 @@ func (s *ListWithdrawsService) Limit(limit int) *ListWithdrawsService {
 
 // Do sends the Request.
 func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/sapi/v1/capital/withdraw/history",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/sapi/v1/capital/withdraw/history")
 	if s.coin != nil {
 		r.SetQuery("coin", *s.coin)
 	}

@@ -48,11 +48,7 @@ func (s *ListTradesService) FromID(fromID int64) *ListTradesService {
 
 // Do send Request
 func (s *ListTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*TradeV3, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/myTrades",
-		SecType:  common.SecTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/api/v3/myTrades")
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
 		r.SetQuery("limit", *s.limit)
@@ -102,11 +98,7 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 
 // Do send Request
 func (s *HistoricalTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/historicalTrades",
-		SecType:  common.SecTypeAPIKey,
-	}
+	r := common.NewGetRequestAPIKey("/api/v3/historicalTrades")
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
 		r.SetQuery("limit", *s.limit)
@@ -192,10 +184,7 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 
 // Do send Request
 func (s *AggTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*AggTrade, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v3/aggTrades",
-	}
+	r := common.NewGetRequestPublic("/api/v3/aggTrades")
 	r.SetQuery("symbol", s.symbol)
 	if s.fromID != nil {
 		r.SetQuery("fromId", *s.fromID)
@@ -250,10 +239,7 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 
 // Do send Request
 func (s *RecentTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
-	r := &common.Request{
-		Method:   "GET",
-		Endpoint: "/api/v1/trades",
-	}
+	r := common.NewGetRequestPublic("/api/v1/trades")
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
 		r.SetQuery("limit", *s.limit)

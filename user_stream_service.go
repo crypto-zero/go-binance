@@ -13,12 +13,7 @@ type StartUserStreamService struct {
 
 // Do send Request
 func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (listenKey string, err error) {
-	r := &common.Request{
-		Method:   "POST",
-		Endpoint: "/api/v3/userDataStream",
-		SecType:  common.SecTypeAPIKey,
-	}
-
+	r := common.NewPostRequestAPIKey("/api/v3/userDataStream")
 	f := func(data []byte) error {
 		j, err := newJSON(data)
 		if err != nil {
@@ -47,11 +42,7 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 
 // Do send Request
 func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
-	r := &common.Request{
-		Method:   "PUT",
-		Endpoint: "/api/v3/userDataStream",
-		SecType:  common.SecTypeAPIKey,
-	}
+	r := common.NewPutRequestAPIKey("/api/v3/userDataStream")
 	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
@@ -70,11 +61,7 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 
 // Do send Request
 func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
-	r := &common.Request{
-		Method:   "DELETE",
-		Endpoint: "/api/v3/userDataStream",
-		SecType:  common.SecTypeAPIKey,
-	}
+	r := common.NewDeleteRequestAPIKey("/api/v3/userDataStream")
 	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
 }
