@@ -50,8 +50,8 @@ func (s *baseTestSuite) assertReq(f func(r *Request)) {
 }
 
 func (s *baseTestSuite) assertRequestEqual(e, a *Request) {
-	s.assertURLValuesEqual(e.query, a.query)
-	s.assertURLValuesEqual(e.form, a.form)
+	s.assertURLValuesEqual(e.Query, a.Query)
+	s.assertURLValuesEqual(e.Form, a.Form)
 }
 
 func (s *baseTestSuite) assertURLValuesEqual(e, a url.Values) {
@@ -95,8 +95,8 @@ func newHTTPResponse(data []byte, statusCode int) *http.Response {
 
 func newRequest() *Request {
 	r := &Request{
-		query: url.Values{},
-		form:  url.Values{},
+		Query: url.Values{},
+		Form:  url.Values{},
 	}
 	return r
 }
@@ -125,7 +125,7 @@ func newMockedClient(apiKey, secretKey string, testnet bool) *mockedClient {
 func (m *mockedClient) do(req *http.Request) (*http.Response, error) {
 	if m.assertReq != nil {
 		r := newRequest()
-		r.query = req.URL.Query()
+		r.Query = req.URL.Query()
 		if req.Body != nil {
 			bs := make([]byte, req.ContentLength)
 			for {
@@ -138,7 +138,7 @@ func (m *mockedClient) do(req *http.Request) (*http.Response, error) {
 			if err != nil {
 				panic(err)
 			}
-			r.form = form
+			r.Form = form
 		}
 		m.assertReq(r)
 	}

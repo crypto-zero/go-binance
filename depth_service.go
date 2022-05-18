@@ -28,8 +28,8 @@ func (s *DepthService) Limit(limit int) *DepthService {
 // Do send Request
 func (s *DepthService) Do(ctx context.Context, opts ...RequestOption) (res *DepthResponse, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v3/depth",
+		Method:   "GET",
+		Endpoint: "/api/v3/depth",
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {

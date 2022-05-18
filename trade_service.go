@@ -47,9 +47,9 @@ func (s *ListTradesService) FromID(fromID int64) *ListTradesService {
 // Do send Request
 func (s *ListTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v3/myTrades",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/api/v3/myTrades",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
@@ -101,9 +101,9 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 // Do send Request
 func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v3/historicalTrades",
-		secType:  SecTypeAPIKey,
+		Method:   "GET",
+		Endpoint: "/api/v3/historicalTrades",
+		SecType:  SecTypeAPIKey,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
@@ -191,8 +191,8 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 // Do send Request
 func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*AggTrade, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v3/aggTrades",
+		Method:   "GET",
+		Endpoint: "/api/v3/aggTrades",
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.fromID != nil {
@@ -249,8 +249,8 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 // Do send Request
 func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v1/trades",
+		Method:   "GET",
+		Endpoint: "/api/v1/trades",
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {

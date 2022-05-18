@@ -103,9 +103,9 @@ func (s *CreateMarginOrderService) SideEffectType(sideEffectType SideEffectType)
 // Do send Request
 func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
 	r := &Request{
-		method:   "POST",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  SecTypeSigned,
+		Method:   "POST",
+		Endpoint: "/sapi/v1/margin/order",
+		SecType:  SecTypeSigned,
 	}
 	m := Params{
 		"symbol": s.symbol,
@@ -198,9 +198,9 @@ func (s *CancelMarginOrderService) NewClientOrderID(newClientOrderID string) *Ca
 // Do send Request
 func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelMarginOrderResponse, err error) {
 	r := &Request{
-		method:   "DELETE",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  SecTypeSigned,
+		Method:   "DELETE",
+		Endpoint: "/sapi/v1/margin/order",
+		SecType:  SecTypeSigned,
 	}
 	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
@@ -259,9 +259,9 @@ func (s *GetMarginOrderService) OrigClientOrderID(origClientOrderID string) *Get
 // Do send Request
 func (s *GetMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/margin/order",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
@@ -303,9 +303,9 @@ func (s *ListMarginOpenOrdersService) IsIsolated(isIsolated bool) *ListMarginOpe
 // Do send Request
 func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/openOrders",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/margin/openOrders",
+		SecType:  SecTypeSigned,
 	}
 	if s.symbol != "" {
 		r.SetQuery("symbol", s.symbol)
@@ -371,9 +371,9 @@ func (s *ListMarginOrdersService) Limit(limit int) *ListMarginOrdersService {
 // Do send Request
 func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/allOrders",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/margin/allOrders",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {

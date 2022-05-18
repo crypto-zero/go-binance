@@ -21,9 +21,9 @@ func (s *GetAssetDetailService) Asset(asset string) *GetAssetDetailService {
 // Do sends the Request.
 func (s *GetAssetDetailService) Do(ctx context.Context) (res map[string]AssetDetail, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/asset/assetDetail",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/asset/assetDetail",
+		SecType:  SecTypeSigned,
 	}
 	if s.asset != nil {
 		r.SetQuery("asset", *s.asset)

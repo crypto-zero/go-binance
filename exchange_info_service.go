@@ -26,9 +26,9 @@ func (s *ExchangeInfoService) Symbols(symbols ...string) *ExchangeInfoService {
 // Do send Request
 func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (res *ExchangeInfo, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/api/v3/exchangeInfo",
-		secType:  SecTypeNone,
+		Method:   "GET",
+		Endpoint: "/api/v3/exchangeInfo",
+		SecType:  SecTypeNone,
 	}
 	m := Params{}
 	if s.symbol != "" {

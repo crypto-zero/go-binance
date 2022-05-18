@@ -224,31 +224,31 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString str
 		return "", err
 	}
 
-	r.id = atomic.AddUint64(&c.globalRequestID, 1)
+	r.ID = atomic.AddUint64(&c.globalRequestID, 1)
 
-	fullURL := fmt.Sprintf("%s%s", c.BaseURL, r.endpoint)
-	if r.recvWindow > 0 {
-		r.SetQuery(recvWindowKey, r.recvWindow)
+	fullURL := fmt.Sprintf("%s%s", c.BaseURL, r.Endpoint)
+	if r.RecvWindow > 0 {
+		r.SetQuery(recvWindowKey, r.RecvWindow)
 	}
-	if r.secType == SecTypeSigned {
+	if r.SecType == SecTypeSigned {
 		r.SetQuery(timestampKey, currentTimestamp()-c.TimeOffset)
 	}
-	queryString := r.query.Encode()
+	queryString := r.Query.Encode()
 	body := &bytes.Buffer{}
-	bodyString = r.form.Encode()
+	bodyString = r.Form.Encode()
 	header := http.Header{}
-	if r.header != nil {
-		header = r.header.Clone()
+	if r.Header != nil {
+		header = r.Header.Clone()
 	}
 	if bodyString != "" {
 		header.Set("Content-Type", "application/x-www-form-urlencoded")
 		body = bytes.NewBufferString(bodyString)
 	}
-	if r.secType == SecTypeAPIKey || r.secType == SecTypeSigned {
+	if r.SecType == SecTypeAPIKey || r.SecType == SecTypeSigned {
 		header.Set("X-MBX-APIKEY", c.APIKey)
 	}
 
-	if r.secType == SecTypeSigned {
+	if r.SecType == SecTypeSigned {
 		raw := fmt.Sprintf("%s%s", queryString, bodyString)
 		mac := hmac.New(sha256.New, []byte(c.SecretKey))
 		_, err = mac.Write([]byte(raw))
@@ -267,9 +267,9 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString str
 		fullURL = fmt.Sprintf("%s?%s", fullURL, queryString)
 	}
 
-	r.fullURL = fullURL
-	r.header = header
-	r.body = body
+	r.FullURL = fullURL
+	r.Header = header
+	r.Body = body
 	return bodyString, nil
 }
 
@@ -281,15 +281,15 @@ func (c *Client) callAPI(ctx context.Context, r *Request, result interface{},
 		return err
 	}
 
-	req, err := http.NewRequest(r.method, r.fullURL, r.body)
+	req, err := http.NewRequest(r.Method, r.FullURL, r.Body)
 	if err != nil {
 		return err
 	}
 
 	req = req.WithContext(ctx)
-	req.Header = r.header
+	req.Header = r.Header
 
-	c.Logger.Debugw("call api prepare", "id", r.id, "url", r.fullURL, "body", bodyString)
+	c.Logger.Debugw("call api prepare", "id", r.ID, "url", r.FullURL, "body", bodyString)
 
 	f := c.do
 	if f == nil {
@@ -314,13 +314,13 @@ func (c *Client) callAPI(ctx context.Context, r *Request, result interface{},
 		}
 	}()
 
-	c.Logger.Debugw("call api reply", "id", r.id, "status_code", res.StatusCode,
+	c.Logger.Debugw("call api reply", "id", r.ID, "status_code", res.StatusCode,
 		"response_headers", res.Header, "response_body", string(data))
 
 	if res.StatusCode >= 400 {
 		apiErr := &common.APIError{Status: res.StatusCode}
 		if e := json.Unmarshal(data, apiErr); e != nil {
-			c.Logger.Debugw("call api parse error failed", "id", r.id, "err", e)
+			c.Logger.Debugw("call api parse error failed", "id", r.ID, "err", e)
 		}
 		return apiErr
 	}

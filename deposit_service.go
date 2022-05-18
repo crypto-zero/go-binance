@@ -58,9 +58,9 @@ func (s *ListDepositsService) Limit(limit int) *ListDepositsService {
 // Do sends the Request.
 func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/capital/deposit/hisrec",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/capital/deposit/hisrec",
+		SecType:  SecTypeSigned,
 	}
 	if s.coin != nil {
 		r.SetQuery("coin", *s.coin)
@@ -126,9 +126,9 @@ func (s *GetDepositsAddressService) Network(network string) *GetDepositsAddressS
 // Do sends the Request.
 func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressResponse, error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/capital/deposit/address",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/capital/deposit/address",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQuery("coin", s.coin)
 	if s.network != nil {

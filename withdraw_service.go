@@ -70,9 +70,9 @@ func (s *CreateWithdrawService) Name(v string) *CreateWithdrawService {
 // Do sends the Request.
 func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResponse, err error) {
 	r := &Request{
-		method:   "POST",
-		endpoint: "/sapi/v1/capital/withdraw/apply",
-		secType:  SecTypeSigned,
+		Method:   "POST",
+		Endpoint: "/sapi/v1/capital/withdraw/apply",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQuery("coin", s.coin)
 	r.SetQuery("address", s.address)
@@ -159,9 +159,9 @@ func (s *ListWithdrawsService) Limit(limit int) *ListWithdrawsService {
 // Do sends the Request.
 func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/capital/withdraw/history",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/capital/withdraw/history",
+		SecType:  SecTypeSigned,
 	}
 	if s.coin != nil {
 		r.SetQuery("coin", *s.coin)

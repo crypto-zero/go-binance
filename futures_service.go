@@ -33,9 +33,9 @@ func (s *FuturesTransferService) Type(transferType FuturesTransferType) *Futures
 // Do send Request
 func (s *FuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
 	r := &Request{
-		method:   "POST",
-		endpoint: "/sapi/v1/futures/transfer",
-		secType:  SecTypeSigned,
+		Method:   "POST",
+		Endpoint: "/sapi/v1/futures/transfer",
+		SecType:  SecTypeSigned,
 	}
 	m := Params{
 		"asset":  s.asset,
@@ -93,9 +93,9 @@ func (s *ListFuturesTransferService) Size(size int64) *ListFuturesTransferServic
 // Do send Request
 func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *FuturesTransferHistory, err error) {
 	r := &Request{
-		method:   "GET",
-		endpoint: "/sapi/v1/futures/transfer",
-		secType:  SecTypeSigned,
+		Method:   "GET",
+		Endpoint: "/sapi/v1/futures/transfer",
+		SecType:  SecTypeSigned,
 	}
 	r.SetQueryParams(Params{
 		"asset":     s.asset,
