@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -43,8 +45,8 @@ func (s *orderServiceTestSuite) TestCreateOrder() {
 	quoteOrderQty := "10.00"
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -117,8 +119,8 @@ func (s *orderServiceTestSuite) TestCreateOrderFull() {
 	price := "0.0001"
 	newClientOrderID := "myOrder1"
 	newOrderRespType := NewOrderRespTypeFULL
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -262,8 +264,8 @@ func (s *orderServiceTestSuite) TestCreateOCO() {
 	stopLimitPrice := "3.2"
 	limitClientOrderID := "myOrder1"
 	newOrderRespType := NewOrderRespTypeFULL
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":               symbol,
 			"side":                 side,
 			"quantity":             quantity,
@@ -413,15 +415,15 @@ func (s *orderServiceTestSuite) TestListOpenOrders() {
 
 	symbol := "LTCBTC"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":     symbol,
 			"recvWindow": recvWindow,
 		})
 		s.assertRequestEqual(e, r)
 	})
 	orders, err := s.client.NewListOpenOrdersService().Symbol(symbol).
-		Do(newContext(), WithRecvWindow(recvWindow))
+		Do(newContext(), common.WithRecvWindow(recvWindow))
 	r := s.r()
 	r.NoError(err)
 	r.Len(orders, 1)
@@ -490,8 +492,8 @@ func (s *orderServiceTestSuite) TestGetOrder() {
 	symbol := "LTCBTC"
 	orderID := int64(1)
 	origClientOrderID := "myOrder1"
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -550,8 +552,8 @@ func (s *orderServiceTestSuite) TestListOrders() {
 	limit := 3
 	startTime := int64(1499827319559)
 	endTime := int64(1499827319560)
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":    symbol,
 			"orderId":   orderID,
 			"startTime": startTime,
@@ -639,8 +641,8 @@ func (s *orderServiceTestSuite) TestCancelOCO() {
 
 	symbol := "BTCUSDT"
 	listClientOrderID := "my-list-order-id"
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":            symbol,
 			"listClientOrderId": listClientOrderID,
 		})
@@ -726,8 +728,8 @@ func (s *orderServiceTestSuite) TestCancelOrder() {
 	orderID := int64(28)
 	origClientOrderID := "myOrder1"
 	newClientOrderID := "cancelMyOrder1"
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -837,8 +839,8 @@ func (s *orderServiceTestSuite) TestCancelOpenOrders() {
 	defer s.assertDo()
 
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol": symbol,
 		})
 		s.assertRequestEqual(e, r)

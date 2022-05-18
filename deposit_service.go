@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListDepositsService fetches deposit history.
@@ -57,10 +59,10 @@ func (s *ListDepositsService) Limit(limit int) *ListDepositsService {
 
 // Do sends the Request.
 func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/capital/deposit/hisrec",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	if s.coin != nil {
 		r.SetQuery("coin", *s.coin)
@@ -125,10 +127,10 @@ func (s *GetDepositsAddressService) Network(network string) *GetDepositsAddressS
 
 // Do sends the Request.
 func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressResponse, error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/capital/deposit/address",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	r.SetQuery("coin", s.coin)
 	if s.network != nil {

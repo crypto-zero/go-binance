@@ -13,6 +13,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -82,7 +84,7 @@ func (s *listDustLogServiceTestSuite) TestListDustLog() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -206,7 +208,7 @@ func (s *dustTransferTestSuite) TestTransfer() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 	asset := []string{"ETH", "LTC", "TRX"}
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		for _, a := range asset {
 			e.AddQuery("asset", a)

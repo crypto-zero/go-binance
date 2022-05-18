@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -60,7 +62,7 @@ func (s *exchangeInfoServiceTestSuite) TestExchangeInfo() {
 	defer s.assertDo()
 	symbol := "ETHBTC"
 	symbols := []string{"ETHBTC", "LTCBTC"}
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest().SetQueryParams(map[string]interface{}{
 			"symbol":  symbol,
 			"symbols": symbols,

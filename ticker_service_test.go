@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -34,7 +36,7 @@ func (s *tickerServiceTestSuite) TestListBookTickers() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -74,7 +76,7 @@ func (s *tickerServiceTestSuite) TestSingleBookTicker() {
 
 	symbol := "LTCBTC"
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
@@ -116,7 +118,7 @@ func (s *tickerServiceTestSuite) TestListPrices() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -146,7 +148,7 @@ func (s *tickerServiceTestSuite) TestListSinglePrice() {
 	defer s.assertDo()
 
 	symbol := "LTCBTC"
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
@@ -193,7 +195,7 @@ func (s *tickerServiceTestSuite) TestPriceChangeStats() {
 	defer s.assertDo()
 
 	symbol := "BNBBTC"
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
@@ -271,7 +273,7 @@ func (s *tickerServiceTestSuite) TestListPriceChangeStats() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -335,7 +337,7 @@ func (s *tickerServiceTestSuite) TestAveragePrice() {
 	defer s.assertDo()
 
 	symbol := "LTCBTC"
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})

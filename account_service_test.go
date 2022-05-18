@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -43,7 +45,7 @@ func (s *accountServiceTestSuite) TestGetAccount() {
   }`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -122,8 +124,8 @@ func (s *accountServiceTestSuite) TestGetAccountSnapshot() {
 	startTime := int64(1498793709153)
 	endTime := int64(1498793709156)
 	limit := 1
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"type":      accountType,
 			"startTime": startTime,
 			"endTime":   endTime,

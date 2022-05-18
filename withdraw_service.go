@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // CreateWithdrawService submits a withdraw Request.
@@ -69,10 +71,10 @@ func (s *CreateWithdrawService) Name(v string) *CreateWithdrawService {
 
 // Do sends the Request.
 func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResponse, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "POST",
 		Endpoint: "/sapi/v1/capital/withdraw/apply",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	r.SetQuery("coin", s.coin)
 	r.SetQuery("address", s.address)
@@ -158,10 +160,10 @@ func (s *ListWithdrawsService) Limit(limit int) *ListWithdrawsService {
 
 // Do sends the Request.
 func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/capital/withdraw/history",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	if s.coin != nil {
 		r.SetQuery("coin", *s.coin)

@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -21,7 +23,7 @@ func (s *userStreamServiceTestSuite) TestStartUserStream() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		s.assertRequestEqual(newRequest(), r)
 	})
 
@@ -36,7 +38,7 @@ func (s *userStreamServiceTestSuite) TestKeepaliveUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		s.assertRequestEqual(newRequest().SetForm("listenKey", listenKey), r)
 	})
 
@@ -50,7 +52,7 @@ func (s *userStreamServiceTestSuite) TestCloseUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *Request) {
+	s.assertReq(func(r *common.Request) {
 		s.assertRequestEqual(newRequest().SetForm("listenKey", listenKey), r)
 	})
 

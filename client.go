@@ -214,7 +214,7 @@ type Client struct {
 	do         doFunc
 }
 
-func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString string, err error) {
+func (c *Client) parseRequest(r *common.Request, opts ...common.RequestOption) (bodyString string, err error) {
 	// set Request options from user
 	for _, opt := range opts {
 		opt(r)
@@ -230,7 +230,7 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString str
 	if r.RecvWindow > 0 {
 		r.SetQuery(recvWindowKey, r.RecvWindow)
 	}
-	if r.SecType == SecTypeSigned {
+	if r.SecType == common.SecTypeSigned {
 		r.SetQuery(timestampKey, currentTimestamp()-c.TimeOffset)
 	}
 	queryString := r.Query.Encode()
@@ -244,11 +244,11 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString str
 		header.Set("Content-Type", "application/x-www-form-urlencoded")
 		body = bytes.NewBufferString(bodyString)
 	}
-	if r.SecType == SecTypeAPIKey || r.SecType == SecTypeSigned {
+	if r.SecType == common.SecTypeAPIKey || r.SecType == common.SecTypeSigned {
 		header.Set("X-MBX-APIKEY", c.APIKey)
 	}
 
-	if r.SecType == SecTypeSigned {
+	if r.SecType == common.SecTypeSigned {
 		raw := fmt.Sprintf("%s%s", queryString, bodyString)
 		mac := hmac.New(sha256.New, []byte(c.SecretKey))
 		_, err = mac.Write([]byte(raw))
@@ -273,8 +273,8 @@ func (c *Client) parseRequest(r *Request, opts ...RequestOption) (bodyString str
 	return bodyString, nil
 }
 
-func (c *Client) callAPI(ctx context.Context, r *Request, result interface{},
-	opts ...RequestOption,
+func (c *Client) callAPI(ctx context.Context, r *common.Request, result interface{},
+	opts ...common.RequestOption,
 ) (err error) {
 	bodyString, err := c.parseRequest(r, opts...)
 	if err != nil {

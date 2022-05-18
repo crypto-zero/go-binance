@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // StartUserStreamService create listen key for user stream service
@@ -10,11 +12,11 @@ type StartUserStreamService struct {
 }
 
 // Do send Request
-func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &Request{
+func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (listenKey string, err error) {
+	r := &common.Request{
 		Method:   "POST",
 		Endpoint: "/api/v3/userDataStream",
-		SecType:  SecTypeAPIKey,
+		SecType:  common.SecTypeAPIKey,
 	}
 
 	f := func(data []byte) error {
@@ -44,11 +46,11 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 }
 
 // Do send Request
-func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &Request{
+func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := &common.Request{
 		Method:   "PUT",
 		Endpoint: "/api/v3/userDataStream",
-		SecType:  SecTypeAPIKey,
+		SecType:  common.SecTypeAPIKey,
 	}
 	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)
@@ -67,11 +69,11 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 }
 
 // Do send Request
-func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &Request{
+func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := &common.Request{
 		Method:   "DELETE",
 		Endpoint: "/api/v3/userDataStream",
-		SecType:  SecTypeAPIKey,
+		SecType:  common.SecTypeAPIKey,
 	}
 	r.SetForm("listenKey", s.listenKey)
 	return s.c.callAPI(ctx, r, nil, opts...)

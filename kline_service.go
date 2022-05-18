@@ -3,6 +3,8 @@ package binance
 import (
 	"context"
 	"fmt"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // KlinesService list klines
@@ -46,8 +48,8 @@ func (s *KlinesService) EndTime(endTime int64) *KlinesService {
 }
 
 // Do send Request
-func (s *KlinesService) Do(ctx context.Context, opts ...RequestOption) (res []*Kline, err error) {
-	r := &Request{
+func (s *KlinesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Kline, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/klines",
 	}

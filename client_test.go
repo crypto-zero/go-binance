@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -45,11 +47,11 @@ func (s *baseTestSuite) assertDo() {
 	s.client.AssertCalled(s.T(), "do", anyHTTPRequest())
 }
 
-func (s *baseTestSuite) assertReq(f func(r *Request)) {
+func (s *baseTestSuite) assertReq(f func(r *common.Request)) {
 	s.client.assertReq = f
 }
 
-func (s *baseTestSuite) assertRequestEqual(e, a *Request) {
+func (s *baseTestSuite) assertRequestEqual(e, a *common.Request) {
 	s.assertURLValuesEqual(e.Query, a.Query)
 	s.assertURLValuesEqual(e.Form, a.Form)
 }
@@ -93,22 +95,22 @@ func newHTTPResponse(data []byte, statusCode int) *http.Response {
 	}
 }
 
-func newRequest() *Request {
-	r := &Request{
+func newRequest() *common.Request {
+	r := &common.Request{
 		Query: url.Values{},
 		Form:  url.Values{},
 	}
 	return r
 }
 
-func newSignedRequest() *Request {
-	return newRequest().SetQueryParams(Params{
+func newSignedRequest() *common.Request {
+	return newRequest().SetQueryParams(common.Params{
 		timestampKey: "",
 		signatureKey: "",
 	})
 }
 
-type assertReqFunc func(r *Request)
+type assertReqFunc func(r *common.Request)
 
 type mockedClient struct {
 	mock.Mock

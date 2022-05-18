@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetAccountService get account info
@@ -10,11 +12,11 @@ type GetAccountService struct {
 }
 
 // Do send Request
-func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res *Account, err error) {
-	r := &Request{
+func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/account",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	res = new(Account)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
@@ -79,11 +81,11 @@ func (s *GetAccountSnapshotService) Limit(limit int) *GetAccountSnapshotService 
 }
 
 // Do send Request
-func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...RequestOption) (res *Snapshot, err error) {
-	r := &Request{
+func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...common.RequestOption) (res *Snapshot, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/accountSnapshot",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	r.SetQuery("type", s.accountType)
 
@@ -169,13 +171,13 @@ type APIRestrictionService struct {
 }
 
 // Do send Request
-func (s *APIRestrictionService) Do(ctx context.Context, opts ...RequestOption) (
+func (s *APIRestrictionService) Do(ctx context.Context, opts ...common.RequestOption) (
 	res *APIRestriction, err error,
 ) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/account/apiRestrictions",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	res = new(APIRestriction)
 	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {

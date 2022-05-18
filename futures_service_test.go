@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,8 +25,8 @@ func (s *futuresTransferTestSuite) TestTransfer() {
 	asset := "BTC"
 	amount := "1.000"
 	transferType := FuturesTransferTypeSpotToFutures
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetFormParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"asset":  asset,
 			"amount": amount,
 			"type":   transferType,
@@ -62,8 +64,8 @@ func (s *futuresTransferTestSuite) TestListFuturesTransfer() {
 	defer s.assertDo()
 	asset := "USDT"
 	startTime := int64(1555056425000)
-	s.assertReq(func(r *Request) {
-		e := newSignedRequest().SetQueryParams(Params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"asset":     asset,
 			"startTime": startTime,
 		})

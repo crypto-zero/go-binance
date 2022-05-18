@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListTradesService list trades
@@ -45,11 +47,11 @@ func (s *ListTradesService) FromID(fromID int64) *ListTradesService {
 }
 
 // Do send Request
-func (s *ListTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
-	r := &Request{
+func (s *ListTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*TradeV3, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/myTrades",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
@@ -99,11 +101,11 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 }
 
 // Do send Request
-func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &Request{
+func (s *HistoricalTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/historicalTrades",
-		SecType:  SecTypeAPIKey,
+		SecType:  common.SecTypeAPIKey,
 	}
 	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
@@ -189,8 +191,8 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 }
 
 // Do send Request
-func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*AggTrade, err error) {
-	r := &Request{
+func (s *AggTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*AggTrade, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/aggTrades",
 	}
@@ -247,8 +249,8 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 }
 
 // Do send Request
-func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &Request{
+func (s *RecentTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v1/trades",
 	}

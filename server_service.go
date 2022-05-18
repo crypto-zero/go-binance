@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // PingService ping server
@@ -10,8 +12,8 @@ type PingService struct {
 }
 
 // Do send Request
-func (s *PingService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &Request{
+func (s *PingService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/ping",
 	}
@@ -24,8 +26,8 @@ type ServerTimeService struct {
 }
 
 // Do send Request
-func (s *ServerTimeService) Do(ctx context.Context, opts ...RequestOption) (serverTime int64, err error) {
-	r := &Request{
+func (s *ServerTimeService) Do(ctx context.Context, opts ...common.RequestOption) (serverTime int64, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/time",
 	}
@@ -50,7 +52,7 @@ type SetServerTimeService struct {
 }
 
 // Do send Request
-func (s *SetServerTimeService) Do(ctx context.Context, opts ...RequestOption) (timeOffset int64, err error) {
+func (s *SetServerTimeService) Do(ctx context.Context, opts ...common.RequestOption) (timeOffset int64, err error) {
 	serverTime, err := s.c.NewServerTimeService().Do(ctx)
 	if err != nil {
 		return 0, err

@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetAssetDetailService fetches all asset detail.
@@ -20,10 +22,10 @@ func (s *GetAssetDetailService) Asset(asset string) *GetAssetDetailService {
 
 // Do sends the Request.
 func (s *GetAssetDetailService) Do(ctx context.Context) (res map[string]AssetDetail, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/asset/assetDetail",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	if s.asset != nil {
 		r.SetQuery("asset", *s.asset)

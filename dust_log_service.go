@@ -11,6 +11,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListDustLogService fetch small amounts of assets exchanged versus BNB
@@ -37,10 +39,10 @@ func (s *ListDustLogService) EndTime(endTime int64) *ListDustLogService {
 
 // Do sends the Request.
 func (s *ListDustLogService) Do(ctx context.Context) (res *DustResult, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/sapi/v1/asset/dribblet",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	if s.startTime != nil {
 		r.SetQuery("startTime", *s.startTime)
@@ -95,10 +97,10 @@ func (s *DustTransferService) Asset(asset []string) *DustTransferService {
 
 // Do sends the Request.
 func (s *DustTransferService) Do(ctx context.Context) (withdraws *DustTransferResponse, err error) {
-	r := &Request{
+	r := &common.Request{
 		Method:   "POST",
 		Endpoint: "/sapi/v1/asset/dust",
-		SecType:  SecTypeSigned,
+		SecType:  common.SecTypeSigned,
 	}
 	for _, a := range s.asset {
 		r.AddQuery("asset", a)

@@ -20,8 +20,8 @@ func (s *ListBookTickersService) Symbol(symbol string) *ListBookTickersService {
 }
 
 // Do send Request
-func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) (res []*BookTicker, err error) {
-	r := &Request{
+func (s *ListBookTickersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*BookTicker, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/ticker/bookTicker",
 	}
@@ -65,8 +65,8 @@ func (s *ListPricesService) Symbol(symbol string) *ListPricesService {
 }
 
 // Do send Request
-func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res []*SymbolPrice, err error) {
-	r := &Request{
+func (s *ListPricesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*SymbolPrice, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/ticker/price",
 	}
@@ -107,8 +107,8 @@ func (s *ListPriceChangeStatsService) Symbol(symbol string) *ListPriceChangeStat
 }
 
 // Do send Request
-func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOption) (res []*PriceChangeStats, err error) {
-	r := &Request{
+func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PriceChangeStats, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/ticker/24hr",
 	}
@@ -166,8 +166,8 @@ func (s *AveragePriceService) Symbol(symbol string) *AveragePriceService {
 }
 
 // Do send Request
-func (s *AveragePriceService) Do(ctx context.Context, opts ...RequestOption) (res *AvgPrice, err error) {
-	r := &Request{
+func (s *AveragePriceService) Do(ctx context.Context, opts ...common.RequestOption) (res *AvgPrice, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/avgPrice",
 	}

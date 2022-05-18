@@ -26,8 +26,8 @@ func (s *DepthService) Limit(limit int) *DepthService {
 }
 
 // Do send Request
-func (s *DepthService) Do(ctx context.Context, opts ...RequestOption) (res *DepthResponse, err error) {
-	r := &Request{
+func (s *DepthService) Do(ctx context.Context, opts ...common.RequestOption) (res *DepthResponse, err error) {
+	r := &common.Request{
 		Method:   "GET",
 		Endpoint: "/api/v3/depth",
 	}
