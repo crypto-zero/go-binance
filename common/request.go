@@ -33,18 +33,12 @@ type Request struct {
 
 // AddQuery add param with key/value to query string
 func (r *Request) AddQuery(key string, value interface{}) *Request {
-	if r.Query == nil {
-		r.Query = url.Values{}
-	}
 	r.Query.Add(key, fmt.Sprintf("%v", value))
 	return r
 }
 
 // SetQuery set param with key/value to query string
 func (r *Request) SetQuery(key string, value interface{}) *Request {
-	if r.Query == nil {
-		r.Query = url.Values{}
-	}
 	r.Query.Set(key, fmt.Sprintf("%v", value))
 	return r
 }
@@ -59,9 +53,6 @@ func (r *Request) SetQueryParams(m Params) *Request {
 
 // SetForm set param with key/value to Request form body
 func (r *Request) SetForm(key string, value interface{}) *Request {
-	if r.Form == nil {
-		r.Form = url.Values{}
-	}
 	r.Form.Set(key, fmt.Sprintf("%v", value))
 	return r
 }
@@ -120,6 +111,8 @@ func NewRequest(method, endpoint string, secType SecType) *Request {
 		Method:   method,
 		Endpoint: endpoint,
 		SecType:  secType,
+		Query:    url.Values{},
+		Form:     url.Values{},
 	}
 }
 
