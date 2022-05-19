@@ -60,7 +60,7 @@ func (s *DepthService) Do(ctx context.Context, opts ...common.RequestOption) (re
 		}
 		return nil
 	}
-	if err := s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err := s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

@@ -38,7 +38,7 @@ func (s *ExchangeInfoService) Do(ctx context.Context, opts ...common.RequestOpti
 	r.SetQueryParams(m)
 
 	res = new(ExchangeInfo)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

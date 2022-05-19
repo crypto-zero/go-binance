@@ -14,7 +14,7 @@ type PingService struct {
 // Do send Request
 func (s *PingService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
 	r := common.NewGetRequestPublic("/api/v3/ping")
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // ServerTimeService get server time
@@ -33,7 +33,7 @@ func (s *ServerTimeService) Do(ctx context.Context, opts ...common.RequestOption
 		serverTime = j.Get("serverTime").MustInt64()
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return 0, err
 	}
 	return serverTime, nil
@@ -51,6 +51,6 @@ func (s *SetServerTimeService) Do(ctx context.Context, opts ...common.RequestOpt
 		return 0, err
 	}
 	timeOffset = currentTimestamp() - serverTime
-	s.c.TimeOffset = timeOffset
+	s.c.UpdateTimeOffset(timeOffset)
 	return timeOffset, nil
 }

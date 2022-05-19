@@ -102,6 +102,6 @@ func (s *serverServiceTestSuite) TestSetServerTime() {
 
 	timeOffset, err := s.client.NewSetServerTimeService().Do(newContext())
 	s.r().NoError(err)
-	s.r().NotZero(s.client.TimeOffset)
-	s.r().EqualValues(timeOffset, s.client.TimeOffset)
+	s.r().NotZero(s.client.GetTimeOffset())
+	s.r().EqualValues(timeOffset, s.client.GetTimeOffset())
 }

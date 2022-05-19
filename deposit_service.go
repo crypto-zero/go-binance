@@ -80,7 +80,7 @@ func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error
 	}
 
 	res = make([]*Deposit, 0)
-	if err = s.c.callAPI(ctx, r, &res); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil
@@ -130,7 +130,7 @@ func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressR
 	}
 
 	res := &GetDepositAddressResponse{}
-	if err := s.c.callAPI(ctx, r, res); err != nil {
+	if err := s.c.CallAPI(ctx, r, res); err != nil {
 		return nil, err
 	}
 	return res, nil

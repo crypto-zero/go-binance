@@ -64,7 +64,7 @@ func (s *ListTradesService) Do(ctx context.Context, opts ...common.RequestOption
 	}
 
 	res = make([]*TradeV3, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -108,7 +108,7 @@ func (s *HistoricalTradesService) Do(ctx context.Context, opts ...common.Request
 	}
 
 	res = make([]*Trade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return
 	}
 	return
@@ -200,7 +200,7 @@ func (s *AggTradesService) Do(ctx context.Context, opts ...common.RequestOption)
 	}
 
 	res = make([]*AggTrade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -246,7 +246,7 @@ func (s *RecentTradesService) Do(ctx context.Context, opts ...common.RequestOpti
 	}
 
 	res = make([]*Trade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

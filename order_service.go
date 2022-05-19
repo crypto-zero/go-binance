@@ -124,7 +124,7 @@ func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, r
 	}
 	r.SetFormParams(m)
 
-	if err = s.c.callAPI(ctx, r, result, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, result, opts...); err != nil {
 		return err
 	}
 	return nil
@@ -309,7 +309,7 @@ func (s *CreateOCOService) createOrder(ctx context.Context, endpoint string, res
 	}
 	r.SetFormParams(m)
 
-	if err = s.c.callAPI(ctx, r, result, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, result, opts...); err != nil {
 		return err
 	}
 	return nil
@@ -384,7 +384,7 @@ func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOp
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -428,7 +428,7 @@ func (s *GetOrderService) Do(ctx context.Context, opts ...common.RequestOption) 
 	}
 
 	res = new(Order)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -513,7 +513,7 @@ func (s *ListOrdersService) Do(ctx context.Context, opts ...common.RequestOption
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -567,7 +567,7 @@ func (s *CancelOrderService) Do(ctx context.Context, opts ...common.RequestOptio
 	}
 
 	res = new(CancelOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -621,7 +621,7 @@ func (s *CancelOCOService) Do(ctx context.Context, opts ...common.RequestOption)
 	}
 
 	res = new(CancelOCOResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -645,7 +645,7 @@ func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...common.Request
 	r.SetQuery("symbol", s.symbol)
 
 	rawMessages := make([]*json.RawMessage, 0)
-	if err = s.c.callAPI(ctx, r, &rawMessages, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &rawMessages, opts...); err != nil {
 		return &CancelOpenOrdersResponse{}, err
 	}
 

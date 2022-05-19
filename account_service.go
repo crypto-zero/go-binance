@@ -15,7 +15,7 @@ type GetAccountService struct {
 func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
 	r := common.NewGetRequestSigned("/api/v3/account")
 	res = new(Account)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -91,7 +91,7 @@ func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...common.Reque
 		r.SetQuery("limit", *s.limit)
 	}
 	res = new(Snapshot)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return &Snapshot{}, err
 	}
 	return res, nil
@@ -168,7 +168,7 @@ func (s *APIRestrictionService) Do(ctx context.Context, opts ...common.RequestOp
 ) {
 	r := common.NewGetRequestSigned("/sapi/v1/account/apiRestrictions")
 	res = new(APIRestriction)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

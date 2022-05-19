@@ -35,7 +35,7 @@ func (s *baseTestSuite) SetupTest() {
 }
 
 func (s *baseTestSuite) mockDo(data []byte, err error, statusCode ...int) {
-	s.client.Client.do = s.client.do
+	s.client.Client.UpdateDoFunc(s.client.do)
 	code := http.StatusOK
 	if len(statusCode) > 0 {
 		code = statusCode[0]

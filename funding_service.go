@@ -42,7 +42,7 @@ func (s *GetFundingAssetService) Do(ctx context.Context) (out map[string]Funding
 	}
 
 	var rsp []FundingAsset
-	if err = s.c.callAPI(ctx, r, &rsp); err != nil {
+	if err = s.c.CallAPI(ctx, r, &rsp); err != nil {
 		return
 	}
 

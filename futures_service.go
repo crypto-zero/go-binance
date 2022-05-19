@@ -42,7 +42,7 @@ func (s *FuturesTransferService) Do(ctx context.Context, opts ...common.RequestO
 	}
 	r.SetFormParams(m)
 	res = new(TransactionResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -106,7 +106,7 @@ func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...common.Requ
 	}
 
 	res = new(FuturesTransferHistory)
-	if err := s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err := s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

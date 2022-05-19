@@ -22,7 +22,7 @@ func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestO
 		listenKey = j.Get("listenKey").MustString()
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
 	return listenKey, nil
@@ -44,7 +44,7 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
 	r := common.NewPutRequestAPIKey("/api/v3/userDataStream")
 	r.SetForm("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // CloseUserStreamService delete listen key
@@ -63,5 +63,5 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
 	r := common.NewDeleteRequestAPIKey("/api/v3/userDataStream")
 	r.SetForm("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }

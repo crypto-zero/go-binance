@@ -2,7 +2,6 @@ package common
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 )
@@ -27,8 +26,6 @@ type Request struct {
 	Form       url.Values
 	RecvWindow int64
 	Header     http.Header
-	Body       io.Reader
-	FullURL    string
 }
 
 // AddQuery add param with key/value to query string

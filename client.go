@@ -1,18 +1,9 @@
 package binance
 
 import (
-	"bytes"
-	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"sync/atomic"
 	"time"
 
 	"github.com/bitly/go-simplejson"
@@ -177,14 +168,11 @@ func getAPIEndpoint(testnet bool) string {
 // You should always call this function before using this SDK.
 // Services will be created by the form client.NewXXXService().
 func NewClient(apiKey, secretKey string, testnet bool) *Client {
+	logger := common.NewDefaultLogger(common.LogInfo, log.New(os.Stderr,
+		"Binance-golang ", log.LstdFlags))
 	return &Client{
-		APIKey:     apiKey,
-		SecretKey:  secretKey,
-		BaseURL:    getAPIEndpoint(testnet),
-		UserAgent:  "Binance/golang",
-		HTTPClient: http.DefaultClient,
-		Logger: common.NewDefaultLogger(common.LogInfo, log.New(os.Stderr,
-			"Binance-golang ", log.LstdFlags)),
+		Client: common.NewClient(apiKey, secretKey, getAPIEndpoint(testnet),
+			"Binance/golang", http.DefaultClient, logger),
 	}
 }
 
@@ -202,142 +190,7 @@ type doFunc func(req *http.Request) (*http.Response, error)
 
 // Client define API client
 type Client struct {
-	globalRequestID uint64
-
-	APIKey     string
-	SecretKey  string
-	BaseURL    string
-	UserAgent  string
-	HTTPClient *http.Client
-	Logger     common.Logger
-	TimeOffset int64
-	do         doFunc
-}
-
-func (c *Client) parseRequest(r *common.Request, opts ...common.RequestOption) (bodyString string, err error) {
-	// set Request options from user
-	for _, opt := range opts {
-		opt(r)
-	}
-	err = r.Validate()
-	if err != nil {
-		return "", err
-	}
-
-	r.ID = atomic.AddUint64(&c.globalRequestID, 1)
-
-	fullURL := fmt.Sprintf("%s%s", c.BaseURL, r.Endpoint)
-	if r.RecvWindow > 0 {
-		r.SetQuery(recvWindowKey, r.RecvWindow)
-	}
-	if r.SecType == common.SecTypeSigned {
-		r.SetQuery(timestampKey, currentTimestamp()-c.TimeOffset)
-	}
-	queryString := r.Query.Encode()
-	body := &bytes.Buffer{}
-	bodyString = r.Form.Encode()
-	header := http.Header{}
-	if r.Header != nil {
-		header = r.Header.Clone()
-	}
-	if bodyString != "" {
-		header.Set("Content-Type", "application/x-www-form-urlencoded")
-		body = bytes.NewBufferString(bodyString)
-	}
-	if r.SecType == common.SecTypeAPIKey || r.SecType == common.SecTypeSigned {
-		header.Set("X-MBX-APIKEY", c.APIKey)
-	}
-
-	if r.SecType == common.SecTypeSigned {
-		raw := fmt.Sprintf("%s%s", queryString, bodyString)
-		mac := hmac.New(sha256.New, []byte(c.SecretKey))
-		_, err = mac.Write([]byte(raw))
-		if err != nil {
-			return "", err
-		}
-		v := url.Values{}
-		v.Set(signatureKey, fmt.Sprintf("%x", mac.Sum(nil)))
-		if queryString == "" {
-			queryString = v.Encode()
-		} else {
-			queryString = fmt.Sprintf("%s&%s", queryString, v.Encode())
-		}
-	}
-	if queryString != "" {
-		fullURL = fmt.Sprintf("%s?%s", fullURL, queryString)
-	}
-
-	r.FullURL = fullURL
-	r.Header = header
-	r.Body = body
-	return bodyString, nil
-}
-
-func (c *Client) callAPI(ctx context.Context, r *common.Request, result interface{},
-	opts ...common.RequestOption,
-) (err error) {
-	bodyString, err := c.parseRequest(r, opts...)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(r.Method, r.FullURL, r.Body)
-	if err != nil {
-		return err
-	}
-
-	req = req.WithContext(ctx)
-	req.Header = r.Header
-
-	c.Logger.Debugw("call api prepare", "id", r.ID, "url", r.FullURL, "body", bodyString)
-
-	f := c.do
-	if f == nil {
-		f = c.HTTPClient.Do
-	}
-
-	res, err := f(req)
-	if err != nil {
-		return err
-	}
-
-	data, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		// Only overwrite the returned error if the original error was nil and an
-		// error occurred while closing the body.
-		if cerr := res.Body.Close(); err == nil && cerr != nil {
-			err = cerr
-		}
-	}()
-
-	c.Logger.Debugw("call api reply", "id", r.ID, "status_code", res.StatusCode,
-		"response_headers", res.Header, "response_body", string(data))
-
-	if res.StatusCode >= 400 {
-		apiErr := &common.APIError{Status: res.StatusCode}
-		if e := json.Unmarshal(data, apiErr); e != nil {
-			c.Logger.Debugw("call api parse error failed", "id", r.ID, "err", e)
-		}
-		return apiErr
-	}
-
-	if result != nil {
-		f, ok := result.(func(data []byte) error)
-		if ok {
-			if err = f(data); err != nil {
-				return err
-			}
-			return nil
-		}
-		if err = json.Unmarshal(data, result); err != nil {
-			return err
-		}
-	}
-	return nil
+	common.Client
 }
 
 // NewPingService init ping service

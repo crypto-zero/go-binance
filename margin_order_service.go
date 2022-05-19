@@ -147,7 +147,7 @@ func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...common.Reques
 	r.SetFormParams(m)
 
 	res = new(CreateOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -211,7 +211,7 @@ func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...common.Reques
 	}
 
 	res = new(CancelMarginOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -265,7 +265,7 @@ func (s *GetMarginOrderService) Do(ctx context.Context, opts ...common.RequestOp
 	}
 
 	res = new(Order)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -301,7 +301,7 @@ func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...common.Req
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -375,7 +375,7 @@ func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...common.Request
 	}
 
 	res = make([]*Order, 0)
-	if err := s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err := s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

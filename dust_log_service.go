@@ -47,7 +47,7 @@ func (s *ListDustLogService) Do(ctx context.Context) (res *DustResult, err error
 		r.SetQuery("endTime", *s.endTime)
 	}
 	res = new(DustResult)
-	if err = s.c.callAPI(ctx, r, res); err != nil {
+	if err = s.c.CallAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil
@@ -98,7 +98,7 @@ func (s *DustTransferService) Do(ctx context.Context) (withdraws *DustTransferRe
 		r.AddQuery("asset", a)
 	}
 	res := new(DustTransferResponse)
-	if err = s.c.callAPI(ctx, r, res); err != nil {
+	if err = s.c.CallAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil

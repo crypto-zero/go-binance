@@ -28,7 +28,7 @@ func (s *GetAssetDetailService) Do(ctx context.Context) (res map[string]AssetDet
 	}
 
 	res = make(map[string]AssetDetail)
-	if err = s.c.callAPI(ctx, r, &res); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil

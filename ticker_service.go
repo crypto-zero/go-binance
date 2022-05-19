@@ -34,7 +34,7 @@ func (s *ListBookTickersService) Do(ctx context.Context, opts ...common.RequestO
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -76,7 +76,7 @@ func (s *ListPricesService) Do(ctx context.Context, opts ...common.RequestOption
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -115,7 +115,7 @@ func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...common.Req
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return res, err
 	}
 	return res, nil
@@ -162,7 +162,7 @@ func (s *AveragePriceService) Do(ctx context.Context, opts ...common.RequestOpti
 	r.SetQuery("symbol", s.symbol)
 
 	res = new(AvgPrice)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return res, err
 	}
 	return res, nil

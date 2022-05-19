@@ -92,7 +92,7 @@ func (s *CreateWithdrawService) Do(ctx context.Context) (res *CreateWithdrawResp
 	}
 
 	res = &CreateWithdrawResponse{}
-	if err = s.c.callAPI(ctx, r, res); err != nil {
+	if err = s.c.CallAPI(ctx, r, res); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -177,7 +177,7 @@ func (s *ListWithdrawsService) Do(ctx context.Context) (res []*Withdraw, err err
 	}
 
 	res = make([]*Withdraw, 0)
-	if err = s.c.callAPI(ctx, r, &res); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil
