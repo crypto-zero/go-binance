@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -34,15 +36,15 @@ func (s *positionMarginHistoryServiceTestSuite) TestPositionMarginHistory() {
 
 	symbol := "BTCUSDT"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":     symbol,
 			"recvWindow": recvWindow,
 		})
 		s.assertRequestEqual(e, r)
 	})
 	orders, err := s.client.NewGetPositionMarginHistoryService().Symbol(symbol).
-		Do(newContext(), WithRecvWindow(recvWindow))
+		Do(newContext(), common.WithRecvWindow(recvWindow))
 	r := s.r()
 	r.NoError(err)
 	r.Len(orders, 1)

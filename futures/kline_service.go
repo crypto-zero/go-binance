@@ -3,6 +3,8 @@ package futures
 import (
 	"context"
 	"fmt"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // KlinesService list klines
@@ -46,21 +48,18 @@ func (s *KlinesService) EndTime(endTime int64) *KlinesService {
 }
 
 // Do send request
-func (s *KlinesService) Do(ctx context.Context, opts ...RequestOption) (res []*Kline, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/klines",
-	}
-	r.setParam("symbol", s.symbol)
-	r.setParam("interval", s.interval)
+func (s *KlinesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Kline, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/klines")
+	r.SetQuery("symbol", s.symbol)
+	r.SetQuery("interval", s.interval)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 
 	f := func(data []byte) error {
@@ -91,7 +90,7 @@ func (s *KlinesService) Do(ctx context.Context, opts ...RequestOption) (res []*K
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

@@ -20,13 +20,10 @@ func (s *ListBookTickersService) Symbol(symbol string) *ListBookTickersService {
 }
 
 // Do send request
-func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) (res []*BookTicker, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/ticker/bookTicker",
-	}
+func (s *ListBookTickersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*BookTicker, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/ticker/bookTicker")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	res = make([]*BookTicker, 0)
@@ -38,7 +35,7 @@ func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) 
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return []*BookTicker{}, err
 	}
 	return res, nil
@@ -66,13 +63,10 @@ func (s *ListPricesService) Symbol(symbol string) *ListPricesService {
 }
 
 // Do send request
-func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res []*SymbolPrice, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/ticker/price",
-	}
+func (s *ListPricesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*SymbolPrice, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/ticker/price")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -81,7 +75,7 @@ func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res 
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -106,13 +100,10 @@ func (s *ListPriceChangeStatsService) Symbol(symbol string) *ListPriceChangeStat
 }
 
 // Do send request
-func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOption) (res []*PriceChangeStats, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/ticker/24hr",
-	}
+func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PriceChangeStats, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/ticker/24hr")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -121,7 +112,7 @@ func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOpt
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return res, err
 	}
 	return res, nil

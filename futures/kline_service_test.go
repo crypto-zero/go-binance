@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -53,8 +55,8 @@ func (s *klineServiceTestSuite) TestKlines() {
 	limit := 10
 	startTime := int64(1499040000000)
 	endTime := int64(1499040000001)
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQueryParams(common.Params{
 			"symbol":    symbol,
 			"interval":  interval,
 			"limit":     limit,

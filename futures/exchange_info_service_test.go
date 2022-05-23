@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -110,7 +112,7 @@ func (s *exchangeInfoServiceTestSuite) TestExchangeInfo() {
 	`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -145,8 +147,10 @@ func (s *exchangeInfoServiceTestSuite) TestExchangeInfo() {
 				UnderlyingSubType:     []string{"STORAGE"},
 				SettlePlan:            0,
 				TriggerProtect:        "0.15",
-				OrderType: []OrderType{OrderTypeLimit, OrderTypeMarket, OrderTypeStop, OrderTypeStopMarket,
-					OrderTypeTakeProfit, OrderTypeTakeProfitMarket, OrderTypeTrailingStopMarket},
+				OrderType: []OrderType{
+					OrderTypeLimit, OrderTypeMarket, OrderTypeStop, OrderTypeStopMarket,
+					OrderTypeTakeProfit, OrderTypeTakeProfitMarket, OrderTypeTrailingStopMarket,
+				},
 				TimeInForce: []TimeInForceType{TimeInForceTypeGTC, TimeInForceTypeIOC, TimeInForceTypeFOK, TimeInForceTypeGTX},
 				Filters: []map[string]interface{}{
 					{"filterType": "PRICE_FILTER", "minPrice": "0.0001", "maxPrice": "300", "tickSize": "0.0001"},

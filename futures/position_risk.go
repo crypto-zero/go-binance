@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetPositionRiskService get account balance
@@ -17,18 +19,14 @@ func (s *GetPositionRiskService) Symbol(symbol string) *GetPositionRiskService {
 }
 
 // Do send request
-func (s *GetPositionRiskService) Do(ctx context.Context, opts ...RequestOption) (res []*PositionRisk, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v2/positionRisk",
-		secType:  secTypeSigned,
-	}
+func (s *GetPositionRiskService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PositionRisk, err error) {
+	r := common.NewGetRequestSigned("/fapi/v2/positionRisk")
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 
 	res = make([]*PositionRisk, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

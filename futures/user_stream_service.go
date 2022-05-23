@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // StartUserStreamService create listen key for user stream service
@@ -10,12 +12,8 @@ type StartUserStreamService struct {
 }
 
 // Do send request
-func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/fapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
+func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (listenKey string, err error) {
+	r := common.NewPostRequestSigned("/fapi/v1/listenKey")
 
 	f := func(data []byte) error {
 		j, err := newJSON(data)
@@ -25,7 +23,7 @@ func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) 
 		listenKey = j.Get("listenKey").MustString()
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
 	return listenKey, nil
@@ -44,14 +42,10 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 }
 
 // Do send request
-func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "PUT",
-		endpoint: "/fapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPutRequestSigned("/fapi/v1/listenKey")
+	r.SetForm("listenKey", s.listenKey)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // CloseUserStreamService delete listen key
@@ -67,12 +61,8 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 }
 
 // Do send request
-func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/fapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewDeleteRequestSigned("/fapi/v1/listenKey")
+	r.SetForm("listenKey", s.listenKey)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }

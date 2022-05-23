@@ -3,6 +3,7 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -21,7 +22,7 @@ func (s *userStreamServiceTestSuite) TestStartUserStream() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		s.assertRequestEqual(newSignedRequest(), r)
 	})
 
@@ -36,8 +37,8 @@ func (s *userStreamServiceTestSuite) TestKeepaliveUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *request) {
-		s.assertRequestEqual(newSignedRequest().setFormParam("listenKey", listenKey), r)
+	s.assertReq(func(r *common.Request) {
+		s.assertRequestEqual(newSignedRequest().SetForm("listenKey", listenKey), r)
 	})
 
 	err := s.client.NewKeepaliveUserStreamService().ListenKey(listenKey).Do(newContext())
@@ -50,8 +51,8 @@ func (s *userStreamServiceTestSuite) TestCloseUserStream() {
 	defer s.assertDo()
 
 	listenKey := "dummykey"
-	s.assertReq(func(r *request) {
-		s.assertRequestEqual(newSignedRequest().setFormParam("listenKey", listenKey), r)
+	s.assertReq(func(r *common.Request) {
+		s.assertRequestEqual(newSignedRequest().SetForm("listenKey", listenKey), r)
 	})
 
 	err := s.client.NewCloseUserStreamService().ListenKey(listenKey).Do(newContext())

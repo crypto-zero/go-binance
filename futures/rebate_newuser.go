@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetRebateNewUserService
@@ -24,22 +26,18 @@ func (s *GetRebateNewUserService) Type(type_future int) *GetRebateNewUserService
 }
 
 // Do send request
-func (s *GetRebateNewUserService) Do(ctx context.Context, opts ...RequestOption) (res *RebateNewUser, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/apiReferral/ifNewUser",
-		secType:  secTypeSigned,
-	}
+func (s *GetRebateNewUserService) Do(ctx context.Context, opts ...common.RequestOption) (res *RebateNewUser, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/apiReferral/ifNewUser")
 
 	if s.brokerageID != "" {
-		r.setParam("brokerId", s.brokerageID)
+		r.SetQuery("brokerId", s.brokerageID)
 	}
 	if s.type_future != 0 {
-		r.setParam("type", s.type_future)
+		r.SetQuery("type", s.type_future)
 	}
 
 	res = &RebateNewUser{}
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

@@ -20,14 +20,10 @@ func (s *PremiumIndexService) Symbol(symbol string) *PremiumIndexService {
 }
 
 // Do send request
-func (s *PremiumIndexService) Do(ctx context.Context, opts ...RequestOption) (res []*PremiumIndex, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/premiumIndex",
-		secType:  secTypeNone,
-	}
+func (s *PremiumIndexService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PremiumIndex, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/premiumIndex")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 
 	f := func(data []byte) error {
@@ -38,7 +34,7 @@ func (s *PremiumIndexService) Do(ctx context.Context, opts ...RequestOption) (re
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -87,25 +83,21 @@ func (s *FundingRateService) Limit(limit int) *FundingRateService {
 }
 
 // Do send request
-func (s *FundingRateService) Do(ctx context.Context, opts ...RequestOption) (res []*FundingRate, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/fundingRate",
-		secType:  secTypeNone,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *FundingRateService) Do(ctx context.Context, opts ...common.RequestOption) (res []*FundingRate, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/fundingRate")
+	r.SetQuery("symbol", s.symbol)
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*FundingRate, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -132,15 +124,11 @@ func (s *GetLeverageBracketService) Symbol(symbol string) *GetLeverageBracketSer
 }
 
 // Do send request
-func (s *GetLeverageBracketService) Do(ctx context.Context, opts ...RequestOption) (res []*LeverageBracket, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/leverageBracket",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *GetLeverageBracketService) Do(ctx context.Context, opts ...common.RequestOption) (res []*LeverageBracket, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/leverageBracket")
+	r.SetQuery("symbol", s.symbol)
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 
 	res = make([]*LeverageBracket, 0)
@@ -153,7 +141,7 @@ func (s *GetLeverageBracketService) Do(ctx context.Context, opts ...RequestOptio
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

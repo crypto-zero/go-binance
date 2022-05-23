@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -32,15 +34,15 @@ func (s *baseRebateNewUserServiceTestSuite) TestRebateNewUser() {
 
 	brokerageID := "123456"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"brokerId":   brokerageID,
 			"recvWindow": recvWindow,
 		})
 		s.assertRequestEqual(e, r)
 	})
 	check, err := s.client.NewGetRebateNewUserService().BrokerageID(brokerageID).
-		Do(newContext(), WithRecvWindow(recvWindow))
+		Do(newContext(), common.WithRecvWindow(recvWindow))
 	fmt.Println(check)
 	r := s.r()
 	r.NoError(err)

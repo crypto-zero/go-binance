@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetBalanceService get account balance
@@ -10,15 +12,11 @@ type GetBalanceService struct {
 }
 
 // Do send request
-func (s *GetBalanceService) Do(ctx context.Context, opts ...RequestOption) (res []*Balance, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v2/balance",
-		secType:  secTypeSigned,
-	}
+func (s *GetBalanceService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Balance, err error) {
+	r := common.NewGetRequestSigned("/fapi/v2/balance")
 
 	res = make([]*Balance, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -41,15 +39,11 @@ type GetAccountService struct {
 }
 
 // Do send request
-func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res *Account, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/account",
-		secType:  secTypeSigned,
-	}
+func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/account")
 
 	res = new(Account)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
