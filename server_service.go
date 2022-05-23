@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // PingService ping server
@@ -9,13 +11,10 @@ type PingService struct {
 	c *Client
 }
 
-// Do send request
-func (s *PingService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/ping",
-	}
-	return s.c.callAPI(ctx, r, nil, opts...)
+// Do send Request
+func (s *PingService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewGetRequestPublic("/api/v3/ping")
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // ServerTimeService get server time
@@ -23,13 +22,9 @@ type ServerTimeService struct {
 	c *Client
 }
 
-// Do send request
-func (s *ServerTimeService) Do(ctx context.Context, opts ...RequestOption) (serverTime int64, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/time",
-	}
-
+// Do send Request
+func (s *ServerTimeService) Do(ctx context.Context, opts ...common.RequestOption) (serverTime int64, err error) {
+	r := common.NewGetRequestPublic("/api/v3/time")
 	f := func(data []byte) error {
 		j, err := newJSON(data)
 		if err != nil {
@@ -38,7 +33,7 @@ func (s *ServerTimeService) Do(ctx context.Context, opts ...RequestOption) (serv
 		serverTime = j.Get("serverTime").MustInt64()
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return 0, err
 	}
 	return serverTime, nil
@@ -49,13 +44,13 @@ type SetServerTimeService struct {
 	c *Client
 }
 
-// Do send request
-func (s *SetServerTimeService) Do(ctx context.Context, opts ...RequestOption) (timeOffset int64, err error) {
+// Do send Request
+func (s *SetServerTimeService) Do(ctx context.Context, opts ...common.RequestOption) (timeOffset int64, err error) {
 	serverTime, err := s.c.NewServerTimeService().Do(ctx)
 	if err != nil {
 		return 0, err
 	}
 	timeOffset = currentTimestamp() - serverTime
-	s.c.TimeOffset = timeOffset
+	s.c.UpdateTimeOffset(timeOffset)
 	return timeOffset, nil
 }

@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // StartUserStreamService create listen key for user stream service
@@ -9,14 +11,9 @@ type StartUserStreamService struct {
 	c *Client
 }
 
-// Do send request
-func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
-	}
-
+// Do send Request
+func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (listenKey string, err error) {
+	r := common.NewPostRequestAPIKey("/api/v3/userDataStream")
 	f := func(data []byte) error {
 		j, err := newJSON(data)
 		if err != nil {
@@ -25,7 +22,7 @@ func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) 
 		listenKey = j.Get("listenKey").MustString()
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return "", err
 	}
 	return listenKey, nil
@@ -43,15 +40,11 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 	return s
 }
 
-// Do send request
-func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "PUT",
-		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+// Do send Request
+func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPutRequestAPIKey("/api/v3/userDataStream")
+	r.SetForm("listenKey", s.listenKey)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // CloseUserStreamService delete listen key
@@ -66,13 +59,9 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 	return s
 }
 
-// Do send request
-func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/api/v3/userDataStream",
-		secType:  secTypeAPIKey,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	return s.c.callAPI(ctx, r, nil, opts...)
+// Do send Request
+func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewDeleteRequestAPIKey("/api/v3/userDataStream")
+	r.SetForm("listenKey", s.listenKey)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }

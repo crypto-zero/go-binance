@@ -26,14 +26,11 @@ func (s *DepthService) Limit(limit int) *DepthService {
 }
 
 // Do send request
-func (s *DepthService) Do(ctx context.Context, opts ...RequestOption) (res *DepthResponse, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/depth",
-	}
-	r.setParam("symbol", s.symbol)
+func (s *DepthService) Do(ctx context.Context, opts ...common.RequestOption) (res *DepthResponse, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/depth")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = new(DepthResponse)
@@ -63,7 +60,7 @@ func (s *DepthService) Do(ctx context.Context, opts ...RequestOption) (res *Dept
 		}
 		return nil
 	}
-	if err = s.c.callAPI(ctx, r, f, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, f, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

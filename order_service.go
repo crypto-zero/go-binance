@@ -3,6 +3,8 @@ package binance
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // CreateOrderService create order
@@ -88,13 +90,10 @@ func (s *CreateOrderService) NewOrderRespType(newOrderRespType NewOrderRespType)
 }
 
 func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, result interface{},
-	opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: endpoint,
-		secType:  secTypeSigned,
-	}
-	m := params{
+	opts ...common.RequestOption,
+) (err error) {
+	r := common.NewPostRequestSigned(endpoint)
+	m := common.Params{
 		"symbol": s.symbol,
 		"side":   s.side,
 		"type":   s.orderType,
@@ -123,16 +122,16 @@ func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, r
 	if s.newOrderRespType != nil {
 		m["newOrderRespType"] = *s.newOrderRespType
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
-	if err = s.c.callAPI(ctx, r, result, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, result, opts...); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Do send request
-func (s *CreateOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
+// Do send Request
+func (s *CreateOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CreateOrderResponse, err error) {
 	res = new(CreateOrderResponse)
 	if err = s.createOrder(ctx, "/api/v3/order", res, opts...); err != nil {
 		return nil, err
@@ -140,8 +139,8 @@ func (s *CreateOrderService) Do(ctx context.Context, opts ...RequestOption) (res
 	return res, nil
 }
 
-// Test send test api to check if the request is valid
-func (s *CreateOrderService) Test(ctx context.Context, opts ...RequestOption) (err error) {
+// Test send test api to check if the Request is valid
+func (s *CreateOrderService) Test(ctx context.Context, opts ...common.RequestOption) (err error) {
 	return s.createOrder(ctx, "/api/v3/order/test", nil, opts...)
 }
 
@@ -273,13 +272,10 @@ func (s *CreateOCOService) NewOrderRespType(newOrderRespType NewOrderRespType) *
 }
 
 func (s *CreateOCOService) createOrder(ctx context.Context, endpoint string, result interface{},
-	opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: endpoint,
-		secType:  secTypeSigned,
-	}
-	m := params{
+	opts ...common.RequestOption,
+) (err error) {
+	r := common.NewPostRequestSigned(endpoint)
+	m := common.Params{
 		"symbol":    s.symbol,
 		"side":      s.side,
 		"quantity":  *s.quantity,
@@ -311,16 +307,16 @@ func (s *CreateOCOService) createOrder(ctx context.Context, endpoint string, res
 	if s.newOrderRespType != nil {
 		m["newOrderRespType"] = *s.newOrderRespType
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
-	if err = s.c.callAPI(ctx, r, result, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, result, opts...); err != nil {
 		return err
 	}
 	return nil
 }
 
-// Do send request
-func (s *CreateOCOService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOCOResponse, err error) {
+// Do send Request
+func (s *CreateOCOService) Do(ctx context.Context, opts ...common.RequestOption) (res *CreateOCOResponse, err error) {
 	res = new(CreateOCOResponse)
 	if err = s.createOrder(ctx, "/api/v3/order/oco", res, opts...); err != nil {
 		return nil, err
@@ -380,19 +376,15 @@ func (s *ListOpenOrdersService) Symbol(symbol string) *ListOpenOrdersService {
 	return s
 }
 
-// Do send request
-func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/openOrders",
-		secType:  secTypeSigned,
-	}
+// Do send Request
+func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/api/v3/openOrders")
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -424,23 +416,19 @@ func (s *GetOrderService) OrigClientOrderID(origClientOrderID string) *GetOrderS
 	return s
 }
 
-// Do send request
-func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/order",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *GetOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *Order, err error) {
+	r := common.NewGetRequestSigned("/api/v3/order")
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setParam("origClientOrderId", *s.origClientOrderID)
+		r.SetQuery("origClientOrderId", *s.origClientOrderID)
 	}
 
 	res = new(Order)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -507,29 +495,25 @@ func (s *ListOrdersService) Limit(limit int) *ListOrdersService {
 	return s
 }
 
-// Do send request
-func (s *ListOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/allOrders",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *ListOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/api/v3/allOrders")
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -568,26 +552,22 @@ func (s *CancelOrderService) NewClientOrderID(newClientOrderID string) *CancelOr
 	return s
 }
 
-// Do send request
-func (s *CancelOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOrderResponse, err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/api/v3/order",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("symbol", s.symbol)
+// Do send Request
+func (s *CancelOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOrderResponse, err error) {
+	r := common.NewDeleteRequestSigned("/api/v3/order")
+	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setFormParam("orderId", *s.orderID)
+		r.SetForm("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setFormParam("origClientOrderId", *s.origClientOrderID)
+		r.SetForm("origClientOrderId", *s.origClientOrderID)
 	}
 	if s.newClientOrderID != nil {
-		r.setFormParam("newClientOrderId", *s.newClientOrderID)
+		r.SetForm("newClientOrderId", *s.newClientOrderID)
 	}
 
 	res = new(CancelOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -626,26 +606,22 @@ func (s *CancelOCOService) NewClientOrderID(newClientOrderID string) *CancelOCOS
 	return s
 }
 
-// Do send request
-func (s *CancelOCOService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOCOResponse, err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/api/v3/orderList",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("symbol", s.symbol)
+// Do send Request
+func (s *CancelOCOService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOCOResponse, err error) {
+	r := common.NewDeleteRequestSigned("/api/v3/orderList")
+	r.SetForm("symbol", s.symbol)
 	if s.listClientOrderID != "" {
-		r.setFormParam("listClientOrderId", s.listClientOrderID)
+		r.SetForm("listClientOrderId", s.listClientOrderID)
 	}
 	if s.orderListID != 0 {
-		r.setFormParam("orderListId", s.orderListID)
+		r.SetForm("orderListId", s.orderListID)
 	}
 	if s.newClientOrderID != "" {
-		r.setFormParam("newClientOrderId", s.newClientOrderID)
+		r.SetForm("newClientOrderId", s.newClientOrderID)
 	}
 
 	res = new(CancelOCOResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -663,17 +639,13 @@ func (s *CancelOpenOrdersService) Symbol(symbol string) *CancelOpenOrdersService
 	return s
 }
 
-// Do send request
-func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOpenOrdersResponse, err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/api/v3/openOrders",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *CancelOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOpenOrdersResponse, err error) {
+	r := common.NewDeleteRequestSigned("/api/v3/openOrders")
+	r.SetQuery("symbol", s.symbol)
 
 	rawMessages := make([]*json.RawMessage, 0)
-	if err = s.c.callAPI(ctx, r, &rawMessages, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &rawMessages, opts...); err != nil {
 		return &CancelOpenOrdersResponse{}, err
 	}
 

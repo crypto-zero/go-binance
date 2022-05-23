@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -30,7 +32,7 @@ func (s *baseTestSuite) SetupTest() {
 }
 
 func (s *baseTestSuite) mockDo(data []byte, err error, statusCode ...int) {
-	s.client.Client.do = s.client.do
+	s.client.UpdateDoFunc(s.client.do)
 	code := http.StatusOK
 	if len(statusCode) > 0 {
 		code = statusCode[0]
@@ -42,13 +44,13 @@ func (s *baseTestSuite) assertDo() {
 	s.client.AssertCalled(s.T(), "do", anyHTTPRequest())
 }
 
-func (s *baseTestSuite) assertReq(f func(r *request)) {
+func (s *baseTestSuite) assertReq(f func(r *common.Request)) {
 	s.client.assertReq = f
 }
 
-func (s *baseTestSuite) assertRequestEqual(e, a *request) {
-	s.assertURLValuesEqual(e.query, a.query)
-	s.assertURLValuesEqual(e.form, a.form)
+func (s *baseTestSuite) assertRequestEqual(e, a *common.Request) {
+	s.assertURLValuesEqual(e.Query, a.Query)
+	s.assertURLValuesEqual(e.Form, a.Form)
 }
 
 func (s *baseTestSuite) assertURLValuesEqual(e, a url.Values) {
@@ -90,22 +92,22 @@ func newHTTPResponse(data []byte, statusCode int) *http.Response {
 	}
 }
 
-func newRequest() *request {
-	r := &request{
-		query: url.Values{},
-		form:  url.Values{},
+func newRequest() *common.Request {
+	r := &common.Request{
+		Query: url.Values{},
+		Form:  url.Values{},
 	}
 	return r
 }
 
-func newSignedRequest() *request {
-	return newRequest().setParams(params{
+func newSignedRequest() *common.Request {
+	return newRequest().SetQueryParams(common.Params{
 		timestampKey: "",
 		signatureKey: "",
 	})
 }
 
-type assertReqFunc func(r *request)
+type assertReqFunc func(r *common.Request)
 
 type mockedClient struct {
 	mock.Mock
@@ -122,7 +124,7 @@ func newMockedClient(apiKey, secretKey string, testnet bool) *mockedClient {
 func (m *mockedClient) do(req *http.Request) (*http.Response, error) {
 	if m.assertReq != nil {
 		r := newRequest()
-		r.query = req.URL.Query()
+		r.Query = req.URL.Query()
 		if req.Body != nil {
 			bs := make([]byte, req.ContentLength)
 			for {
@@ -135,7 +137,7 @@ func (m *mockedClient) do(req *http.Request) (*http.Response, error) {
 			if err != nil {
 				panic(err)
 			}
-			r.form = form
+			r.Form = form
 		}
 		m.assertReq(r)
 	}

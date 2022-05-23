@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // CreateOrderService create order
@@ -122,13 +124,9 @@ func (s *CreateOrderService) ClosePosition(closePosition bool) *CreateOrderServi
 	return s
 }
 
-func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, opts ...RequestOption) (data []byte, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: endpoint,
-		secType:  secTypeSigned,
-	}
-	m := params{
+func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, opts ...common.RequestOption) (data []byte, err error) {
+	r := common.NewPostRequestSigned(endpoint)
+	m := common.Params{
 		"symbol":           s.symbol,
 		"side":             s.side,
 		"type":             s.orderType,
@@ -168,8 +166,8 @@ func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, o
 	if s.closePosition != nil {
 		m["closePosition"] = *s.closePosition
 	}
-	r.setFormParams(m)
-	data, err = s.c.callAPI(ctx, r, opts...)
+	r.SetFormParams(m)
+	data, err = s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -177,7 +175,7 @@ func (s *CreateOrderService) createOrder(ctx context.Context, endpoint string, o
 }
 
 // Do send request
-func (s *CreateOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
+func (s *CreateOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CreateOrderResponse, err error) {
 	data, err := s.createOrder(ctx, "/dapi/v1/order", opts...)
 	if err != nil {
 		return nil, err
@@ -238,19 +236,15 @@ func (s *ListOpenOrdersService) Pair(pair string) *ListOpenOrdersService {
 }
 
 // Do send request
-func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/openOrders",
-		secType:  secTypeSigned,
-	}
+func (s *ListOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/openOrders")
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 	if s.pair != "" {
-		r.setParam("pair", s.symbol)
+		r.SetQuery("pair", s.symbol)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*Order{}, err
 	}
@@ -289,20 +283,16 @@ func (s *GetOrderService) OrigClientOrderID(origClientOrderID string) *GetOrderS
 }
 
 // Do send request
-func (s *GetOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/order",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *GetOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *Order, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/order")
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setParam("origClientOrderId", *s.origClientOrderID)
+		r.SetQuery("origClientOrderId", *s.origClientOrderID)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -390,31 +380,27 @@ func (s *ListOrdersService) Limit(limit int) *ListOrdersService {
 }
 
 // Do send request
-func (s *ListOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/allOrders",
-		secType:  secTypeSigned,
-	}
+func (s *ListOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/allOrders")
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 	if s.pair != "" {
-		r.setParam("pair", s.pair)
+		r.SetQuery("pair", s.pair)
 	}
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*Order{}, err
 	}
@@ -453,20 +439,16 @@ func (s *CancelOrderService) OrigClientOrderID(origClientOrderID string) *Cancel
 }
 
 // Do send request
-func (s *CancelOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelOrderResponse, err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/dapi/v1/order",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("symbol", s.symbol)
+func (s *CancelOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelOrderResponse, err error) {
+	r := common.NewDeleteRequestSigned("/dapi/v1/order")
+	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setFormParam("orderId", *s.orderID)
+		r.SetForm("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setFormParam("origClientOrderId", *s.origClientOrderID)
+		r.SetForm("origClientOrderId", *s.origClientOrderID)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -519,14 +501,10 @@ func (s *CancelAllOpenOrdersService) Symbol(symbol string) *CancelAllOpenOrdersS
 }
 
 // Do send request
-func (s *CancelAllOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/dapi/v1/allOpenOrders",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("symbol", s.symbol)
-	_, err = s.c.callAPI(ctx, r, opts...)
+func (s *CancelAllOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewDeleteRequestSigned("/dapi/v1/allOpenOrders")
+	r.SetForm("symbol", s.symbol)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return err
 	}
@@ -574,28 +552,24 @@ func (s *ListLiquidationOrdersService) Limit(limit int) *ListLiquidationOrdersSe
 }
 
 // Do send request
-func (s *ListLiquidationOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*LiquidationOrder, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/allForceOrders",
-		secType:  secTypeNone,
-	}
+func (s *ListLiquidationOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*LiquidationOrder, err error) {
+	r := common.NewGetRequestPublic("/dapi/v1/allForceOrders")
 	if s.pair != nil {
-		r.setParam("pair", *s.pair)
+		r.SetQuery("pair", *s.pair)
 	}
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*LiquidationOrder{}, err
 	}

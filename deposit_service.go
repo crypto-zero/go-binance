@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListDepositsService fetches deposit history.
@@ -55,34 +57,30 @@ func (s *ListDepositsService) Limit(limit int) *ListDepositsService {
 	return s
 }
 
-// Do sends the request.
+// Do send the Request.
 func (s *ListDepositsService) Do(ctx context.Context) (res []*Deposit, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/capital/deposit/hisrec",
-		secType:  secTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/sapi/v1/capital/deposit/hisrec")
 	if s.coin != nil {
-		r.setParam("coin", *s.coin)
+		r.SetQuery("coin", *s.coin)
 	}
 	if s.status != nil {
-		r.setParam("status", *s.status)
+		r.SetQuery("status", *s.status)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.offset != nil {
-		r.setParam("offset", *s.offset)
+		r.SetQuery("offset", *s.offset)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*Deposit, 0)
-	if err = s.c.callAPI(ctx, r, &res); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res); err != nil {
 		return
 	}
 	return res, nil
@@ -123,20 +121,16 @@ func (s *GetDepositsAddressService) Network(network string) *GetDepositsAddressS
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *GetDepositsAddressService) Do(ctx context.Context) (*GetDepositAddressResponse, error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/capital/deposit/address",
-		secType:  secTypeSigned,
-	}
-	r.setParam("coin", s.coin)
+	r := common.NewGetRequestSigned("/sapi/v1/capital/deposit/address")
+	r.SetQuery("coin", s.coin)
 	if s.network != nil {
-		r.setParam("network", *s.network)
+		r.SetQuery("network", *s.network)
 	}
 
 	res := &GetDepositAddressResponse{}
-	if err := s.c.callAPI(ctx, r, res); err != nil {
+	if err := s.c.CallAPI(ctx, r, res); err != nil {
 		return nil, err
 	}
 	return res, nil

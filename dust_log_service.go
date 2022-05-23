@@ -11,6 +11,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListDustLogService fetch small amounts of assets exchanged versus BNB
@@ -35,21 +37,17 @@ func (s *ListDustLogService) EndTime(endTime int64) *ListDustLogService {
 	return s
 }
 
-// Do sends the request.
+// Do sends the Request.
 func (s *ListDustLogService) Do(ctx context.Context) (res *DustResult, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/asset/dribblet",
-		secType:  secTypeSigned,
-	}
+	r := common.NewGetRequestSigned("/sapi/v1/asset/dribblet")
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	res = new(DustResult)
-	if err = s.c.callAPI(ctx, r, res); err != nil {
+	if err = s.c.CallAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil
@@ -93,18 +91,14 @@ func (s *DustTransferService) Asset(asset []string) *DustTransferService {
 	return s
 }
 
-// Do sends the request.
+// Do send the Request.
 func (s *DustTransferService) Do(ctx context.Context) (withdraws *DustTransferResponse, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/sapi/v1/asset/dust",
-		secType:  secTypeSigned,
-	}
+	r := common.NewPostRequestSigned("/sapi/v1/asset/dust")
 	for _, a := range s.asset {
-		r.addParam("asset", a)
+		r.AddQuery("asset", a)
 	}
 	res := new(DustTransferResponse)
-	if err = s.c.callAPI(ctx, r, res); err != nil {
+	if err = s.c.CallAPI(ctx, r, res); err != nil {
 		return
 	}
 	return res, nil

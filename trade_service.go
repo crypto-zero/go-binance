@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListTradesService list trades
@@ -44,29 +46,25 @@ func (s *ListTradesService) FromID(fromID int64) *ListTradesService {
 	return s
 }
 
-// Do send request
-func (s *ListTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*TradeV3, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/myTrades",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *ListTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*TradeV3, err error) {
+	r := common.NewGetRequestSigned("/api/v3/myTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 
 	res = make([]*TradeV3, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -98,23 +96,19 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 	return s
 }
 
-// Do send request
-func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/historicalTrades",
-		secType:  secTypeAPIKey,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *HistoricalTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := common.NewGetRequestAPIKey("/api/v3/historicalTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 
 	res = make([]*Trade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return
 	}
 	return
@@ -188,28 +182,25 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 	return s
 }
 
-// Do send request
-func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*AggTrade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/aggTrades",
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *AggTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*AggTrade, err error) {
+	r := common.NewGetRequestPublic("/api/v3/aggTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*AggTrade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -246,19 +237,16 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 	return s
 }
 
-// Do send request
-func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v1/trades",
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *RecentTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := common.NewGetRequestPublic("/api/v1/trades")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*Trade, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

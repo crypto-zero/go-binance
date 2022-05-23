@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // FuturesTransferService transfer asset between spot account and futures account
@@ -30,21 +32,17 @@ func (s *FuturesTransferService) Type(transferType FuturesTransferType) *Futures
 	return s
 }
 
-// Do send request
-func (s *FuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *TransactionResponse, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/sapi/v1/futures/transfer",
-		secType:  secTypeSigned,
-	}
-	m := params{
+// Do send Request
+func (s *FuturesTransferService) Do(ctx context.Context, opts ...common.RequestOption) (res *TransactionResponse, err error) {
+	r := common.NewPostRequestSigned("/sapi/v1/futures/transfer")
+	m := common.Params{
 		"asset":  s.asset,
 		"amount": s.amount,
 		"type":   s.transferType,
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 	res = new(TransactionResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -90,29 +88,25 @@ func (s *ListFuturesTransferService) Size(size int64) *ListFuturesTransferServic
 	return s
 }
 
-// Do send request
-func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...RequestOption) (res *FuturesTransferHistory, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/futures/transfer",
-		secType:  secTypeSigned,
-	}
-	r.setParams(params{
+// Do send Request
+func (s *ListFuturesTransferService) Do(ctx context.Context, opts ...common.RequestOption) (res *FuturesTransferHistory, err error) {
+	r := common.NewGetRequestSigned("/sapi/v1/futures/transfer")
+	r.SetQueryParams(common.Params{
 		"asset":     s.asset,
 		"startTime": s.startTime,
 	})
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.current != nil {
-		r.setParam("current", *s.current)
+		r.SetQuery("current", *s.current)
 	}
 	if s.size != nil {
-		r.setParam("size", *s.size)
+		r.SetQuery("size", *s.size)
 	}
 
 	res = new(FuturesTransferHistory)
-	if err := s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err := s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -36,9 +38,9 @@ func (s *depthServiceTestSuite) TestDepth() {
 	defer s.assertDo()
 	symbol := "LTCBTC"
 	limit := 3
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol).
-			setParam("limit", limit)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol).
+			SetQuery("limit", limit)
 		s.assertRequestEqual(e, r)
 	})
 	res, err := s.client.NewDepthService().Symbol(symbol).Limit(limit).Do(newContext())

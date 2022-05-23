@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // HistoricalTradesService trades
@@ -31,21 +33,17 @@ func (s *HistoricalTradesService) FromID(fromID int64) *HistoricalTradesService 
 }
 
 // Do send request
-func (s *HistoricalTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/historicalTrades",
-		secType:  secTypeAPIKey,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *HistoricalTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := common.NewGetRequestAPIKey("/fapi/v1/historicalTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return
 	}
 	return
@@ -118,26 +116,23 @@ func (s *AggTradesService) Limit(limit int) *AggTradesService {
 }
 
 // Do send request
-func (s *AggTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*AggTrade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/aggTrades",
-	}
-	r.setParam("symbol", s.symbol)
+func (s *AggTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*AggTrade, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/aggTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.fromID != nil {
-		r.setParam("fromId", *s.fromID)
+		r.SetQuery("fromId", *s.fromID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -174,17 +169,14 @@ func (s *RecentTradesService) Limit(limit int) *RecentTradesService {
 }
 
 // Do send request
-func (s *RecentTradesService) Do(ctx context.Context, opts ...RequestOption) (res []*Trade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/trades",
-	}
-	r.setParam("symbol", s.symbol)
+func (s *RecentTradesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Trade, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/trades")
+	r.SetQuery("symbol", s.symbol)
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -231,27 +223,23 @@ func (s *ListAccountTradeService) Limit(limit int) *ListAccountTradeService {
 }
 
 // Do send request
-func (s *ListAccountTradeService) Do(ctx context.Context, opts ...RequestOption) (res []*AccountTrade, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/userTrades",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *ListAccountTradeService) Do(ctx context.Context, opts ...common.RequestOption) (res []*AccountTrade, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/userTrades")
+	r.SetQuery("symbol", s.symbol)
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.fromID != nil {
-		r.setParam("fromID", *s.fromID)
+		r.SetQuery("fromID", *s.fromID)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

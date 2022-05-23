@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetPositionRiskService get account balance
@@ -25,19 +27,15 @@ func (s *GetPositionRiskService) Pair(pair string) *GetPositionRiskService {
 }
 
 // Do send request
-func (s *GetPositionRiskService) Do(ctx context.Context, opts ...RequestOption) (res []*PositionRisk, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/positionRisk",
-		secType:  secTypeSigned,
-	}
+func (s *GetPositionRiskService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PositionRisk, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/positionRisk")
 	if s.marginAsset != nil {
-		r.setParam("marginAsset", *s.marginAsset)
+		r.SetQuery("marginAsset", *s.marginAsset)
 	}
 	if s.pair != nil {
-		r.setParam("pair", *s.pair)
+		r.SetQuery("pair", *s.pair)
 	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*PositionRisk{}, err
 	}

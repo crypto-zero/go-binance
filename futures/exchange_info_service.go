@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ExchangeInfoService exchange info service
@@ -10,15 +12,11 @@ type ExchangeInfoService struct {
 }
 
 // Do send request
-func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (res *ExchangeInfo, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/exchangeInfo",
-		secType:  secTypeNone,
-	}
+func (s *ExchangeInfoService) Do(ctx context.Context, opts ...common.RequestOption) (res *ExchangeInfo, err error) {
+	r := common.NewGetRequestPublic("/fapi/v1/exchangeInfo")
 
 	res = new(ExchangeInfo)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

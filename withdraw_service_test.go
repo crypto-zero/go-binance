@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -31,8 +33,8 @@ func (s *withdrawServiceTestSuite) TestCreateWithdraw() {
 	amount := "0.01"
 	transactionFeeFlag := true
 	name := "eth"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"coin":               coin,
 			"withdrawOrderId":    withdrawOrderID,
 			"network":            network,
@@ -99,8 +101,8 @@ func (s *withdrawServiceTestSuite) TestListWithdraws() {
 	endTime := int64(1508198532001)
 	offset := 0
 	limit := 1000
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"coin":      coin,
 			"status":    status,
 			"startTime": startTime,

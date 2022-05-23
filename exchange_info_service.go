@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ExchangeInfoService exchange info service
@@ -23,24 +25,20 @@ func (s *ExchangeInfoService) Symbols(symbols ...string) *ExchangeInfoService {
 	return s
 }
 
-// Do send request
-func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (res *ExchangeInfo, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/exchangeInfo",
-		secType:  secTypeNone,
-	}
-	m := params{}
+// Do send Request
+func (s *ExchangeInfoService) Do(ctx context.Context, opts ...common.RequestOption) (res *ExchangeInfo, err error) {
+	r := common.NewGetRequestPublic("/api/v3/exchangeInfo")
+	m := common.Params{}
 	if s.symbol != "" {
 		m["symbol"] = s.symbol
 	}
 	if len(s.symbols) != 0 {
 		m["symbols"] = s.symbols
 	}
-	r.setParams(m)
+	r.SetQueryParams(m)
 
 	res = new(ExchangeInfo)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

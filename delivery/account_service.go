@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetBalanceService get account balance
@@ -11,13 +13,9 @@ type GetBalanceService struct {
 }
 
 // Do send request
-func (s *GetBalanceService) Do(ctx context.Context, opts ...RequestOption) (res []*Balance, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/balance",
-		secType:  secTypeSigned,
-	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+func (s *GetBalanceService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Balance, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/balance")
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*Balance{}, err
 	}
@@ -47,13 +45,9 @@ type GetAccountService struct {
 }
 
 // Do send request
-func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res *Account, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/account",
-		secType:  secTypeSigned,
-	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/account")
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}

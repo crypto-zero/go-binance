@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetPositionMarginHistoryService get position margin history service
@@ -45,28 +47,24 @@ func (s *GetPositionMarginHistoryService) Limit(limit int64) *GetPositionMarginH
 }
 
 // Do send request
-func (s *GetPositionMarginHistoryService) Do(ctx context.Context, opts ...RequestOption) (res []*PositionMarginHistory, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/positionMargin/history",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *GetPositionMarginHistoryService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PositionMarginHistory, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/positionMargin/history")
+	r.SetQuery("symbol", s.symbol)
 	if s._type != nil {
-		r.setParam("type", *s._type)
+		r.SetQuery("type", *s._type)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*PositionMarginHistory, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

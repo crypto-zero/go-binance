@@ -3,6 +3,8 @@ package delivery
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -36,7 +38,7 @@ func (s *tickerServiceTestSuite) TestListBookTickers() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -81,8 +83,8 @@ func (s *tickerServiceTestSuite) TestSingleBookTicker() {
 
 	symbol := "BTCUSD_210625"
 
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 
@@ -125,8 +127,8 @@ func (s *tickerServiceTestSuite) TestListBookTickersWithPair() {
 
 	pair := "ETHUSD"
 
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("pair", pair)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("pair", pair)
 		s.assertRequestEqual(e, r)
 	})
 	tickers, err := s.client.NewListBookTickersService().Pair("ETHUSD").Do(newContext())
@@ -179,7 +181,7 @@ func (s *tickerServiceTestSuite) TestListPrices() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -214,8 +216,8 @@ func (s *tickerServiceTestSuite) TestListSinglePrice() {
 	defer s.assertDo()
 
 	symbol := "BTCUSD_PERP"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 
@@ -248,8 +250,8 @@ func (s *tickerServiceTestSuite) TestListPricesWithPair() {
 	defer s.assertDo()
 
 	pair := "BTCUSD"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("pair", pair)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("pair", pair)
 		s.assertRequestEqual(e, r)
 	})
 
@@ -322,7 +324,7 @@ func (s *tickerServiceTestSuite) TestListPriceChangeStats() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -400,8 +402,8 @@ func (s *tickerServiceTestSuite) TestSinglePriceChangeStats() {
 	defer s.assertDo()
 
 	symbol := "BTCUSD_PERP"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 	stats, err := s.client.NewListPriceChangeStatsService().Symbol(symbol).Do(newContext())
@@ -475,8 +477,8 @@ func (s *tickerServiceTestSuite) TestPriceChangeStatsWithPair() {
 	defer s.assertDo()
 
 	pair := "BTCUSD"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("pair", pair)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("pair", pair)
 		s.assertRequestEqual(e, r)
 	})
 	stats, err := s.client.NewListPriceChangeStatsService().Pair(pair).Do(newContext())

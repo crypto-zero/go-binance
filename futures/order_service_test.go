@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -59,8 +61,8 @@ func (s *orderServiceTestSuite) TestCreateOrder() {
 	priceProtect := true
 	newOrderResponseType := NewOrderRespTypeRESULT
 	closePosition := false
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":           symbol,
 			"side":             side,
 			"type":             orderType,
@@ -167,15 +169,15 @@ func (s *orderServiceTestSuite) TestListOpenOrders() {
 
 	symbol := "BTCUSDT"
 	recvWindow := int64(1000)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":     symbol,
 			"recvWindow": recvWindow,
 		})
 		s.assertRequestEqual(e, r)
 	})
 	orders, err := s.client.NewListOpenOrdersService().Symbol(symbol).
-		Do(newContext(), WithRecvWindow(recvWindow))
+		Do(newContext(), common.WithRecvWindow(recvWindow))
 	r := s.r()
 	r.NoError(err)
 	r.Len(orders, 1)
@@ -258,8 +260,8 @@ func (s *orderServiceTestSuite) TestGetOrder() {
 	symbol := "BTCUSDT"
 	orderID := int64(1)
 	origClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -327,8 +329,8 @@ func (s *orderServiceTestSuite) TestListOrders() {
 	limit := 3
 	startTime := int64(1499827319559)
 	endTime := int64(1499827319560)
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol":    symbol,
 			"orderId":   orderID,
 			"startTime": startTime,
@@ -397,8 +399,8 @@ func (s *orderServiceTestSuite) TestCancelOrder() {
 	symbol := "BTCUSDT"
 	orderID := int64(28)
 	origClientOrderID := "myOrder1"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":            symbol,
 			"orderId":           orderID,
 			"origClientOrderId": origClientOrderID,
@@ -469,8 +471,8 @@ func (s *orderServiceTestSuite) TestCancelAllOpenOrders() {
 	defer s.assertDo()
 
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol": symbol,
 		})
 		s.assertRequestEqual(e, r)
@@ -503,8 +505,8 @@ func (s *orderServiceTestSuite) TestListLiquidationOrders() {
 	startTime := int64(1568014460893)
 	endTime := int64(1568014460894)
 	limit := 1
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQueryParams(common.Params{
 			"symbol":    symbol,
 			"startTime": startTime,
 			"endTime":   endTime,

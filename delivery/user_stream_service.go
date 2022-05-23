@@ -2,6 +2,8 @@ package delivery
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // StartUserStreamService create listen key for user stream service
@@ -10,13 +12,9 @@ type StartUserStreamService struct {
 }
 
 // Do send request
-func (s *StartUserStreamService) Do(ctx context.Context, opts ...RequestOption) (listenKey string, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/dapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+func (s *StartUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (listenKey string, err error) {
+	r := common.NewPostRequestSigned("/dapi/v1/listenKey")
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return "", err
 	}
@@ -41,14 +39,10 @@ func (s *KeepaliveUserStreamService) ListenKey(listenKey string) *KeepaliveUserS
 }
 
 // Do send request
-func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "PUT",
-		endpoint: "/dapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	_, err = s.c.callAPI(ctx, r, opts...)
+func (s *KeepaliveUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPutRequestSigned("/dapi/v1/listenKey")
+	r.SetForm("listenKey", s.listenKey)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	return err
 }
 
@@ -65,13 +59,9 @@ func (s *CloseUserStreamService) ListenKey(listenKey string) *CloseUserStreamSer
 }
 
 // Do send request
-func (s *CloseUserStreamService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/dapi/v1/listenKey",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("listenKey", s.listenKey)
-	_, err = s.c.callAPI(ctx, r, opts...)
+func (s *CloseUserStreamService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewDeleteRequestSigned("/dapi/v1/listenKey")
+	r.SetForm("listenKey", s.listenKey)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	return err
 }

@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetFundingAssetService fetches all asset detail.
@@ -25,26 +27,22 @@ func (s *GetFundingAssetService) NeedBTCValuation(needBtcValuation bool) *GetFun
 	return s
 }
 
-// Do send the request.
+// Do send the Request.
 func (s *GetFundingAssetService) Do(ctx context.Context) (out map[string]FundingAsset, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/sapi/v1/asset/get-funding-asset",
-		secType:  secTypeSigned,
-	}
+	r := common.NewPostRequestSigned("/sapi/v1/asset/get-funding-asset")
 	if s.asset != nil {
-		r.setFormParam("asset", *s.asset)
+		r.SetForm("asset", *s.asset)
 	}
 	if s.needBtcValuation != nil {
 		val := "true"
 		if !*s.needBtcValuation {
 			val = "false"
 		}
-		r.setFormParam("needBtcValuation", val)
+		r.SetForm("needBtcValuation", val)
 	}
 
 	var rsp []FundingAsset
-	if err = s.c.callAPI(ctx, r, &rsp); err != nil {
+	if err = s.c.CallAPI(ctx, r, &rsp); err != nil {
 		return
 	}
 

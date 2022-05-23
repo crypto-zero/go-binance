@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ChangeLeverageService change user's initial leverage of specific symbol market
@@ -24,19 +26,15 @@ func (s *ChangeLeverageService) Leverage(leverage int) *ChangeLeverageService {
 }
 
 // Do send request
-func (s *ChangeLeverageService) Do(ctx context.Context, opts ...RequestOption) (res *SymbolLeverage, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/fapi/v1/leverage",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangeLeverageService) Do(ctx context.Context, opts ...common.RequestOption) (res *SymbolLeverage, err error) {
+	r := common.NewPostRequestSigned("/fapi/v1/leverage")
+	r.SetFormParams(common.Params{
 		"symbol":   s.symbol,
 		"leverage": s.leverage,
 	})
 
 	res = new(SymbolLeverage)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -69,17 +67,13 @@ func (s *ChangeMarginTypeService) MarginType(marginType MarginType) *ChangeMargi
 }
 
 // Do send request
-func (s *ChangeMarginTypeService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/fapi/v1/marginType",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangeMarginTypeService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/fapi/v1/marginType")
+	r.SetFormParams(common.Params{
 		"symbol":     s.symbol,
 		"marginType": s.marginType,
 	})
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // UpdatePositionMarginService update isolated position margin
@@ -116,13 +110,9 @@ func (s *UpdatePositionMarginService) Type(actionType int) *UpdatePositionMargin
 }
 
 // Do send request
-func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/fapi/v1/positionMargin",
-		secType:  secTypeSigned,
-	}
-	m := params{
+func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/fapi/v1/positionMargin")
+	m := common.Params{
 		"symbol": s.symbol,
 		"amount": s.amount,
 		"type":   s.actionType,
@@ -130,9 +120,9 @@ func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...RequestOpt
 	if s.positionSide != nil {
 		m["positionSide"] = *s.positionSide
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // ChangePositionModeService change user's position mode
@@ -152,16 +142,12 @@ func (s *ChangePositionModeService) DualSide(dualSide bool) *ChangePositionModeS
 }
 
 // Do send request
-func (s *ChangePositionModeService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/fapi/v1/positionSide/dual",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangePositionModeService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/fapi/v1/positionSide/dual")
+	r.SetFormParams(common.Params{
 		"dualSidePosition": s.dualSide,
 	})
-	return s.c.callAPI(ctx, r, nil, opts...)
+	return s.c.CallAPI(ctx, r, nil, opts...)
 }
 
 // GetPositionModeService get user's position mode
@@ -175,16 +161,12 @@ type PositionMode struct {
 }
 
 // Do send request
-func (s *GetPositionModeService) Do(ctx context.Context, opts ...RequestOption) (res *PositionMode, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/positionSide/dual",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{})
+func (s *GetPositionModeService) Do(ctx context.Context, opts ...common.RequestOption) (res *PositionMode, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/positionSide/dual")
+	r.SetFormParams(common.Params{})
 
 	res = &PositionMode{}
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -24,8 +26,8 @@ func (s *positionServiceTestSuite) TestChangeLeverage() {
 	defer s.assertDo()
 	symbol := "BTCUSDT"
 	leverage := 21
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":   symbol,
 			"leverage": leverage,
 		})
@@ -52,8 +54,8 @@ func (s *positionServiceTestSuite) TestChangeMarginType() {
 	defer s.assertDo()
 	symbol := "BTCUSDT"
 	marginType := MarginTypeIsolated
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":     symbol,
 			"marginType": marginType,
 		})
@@ -77,8 +79,8 @@ func (s *positionServiceTestSuite) TestUpdatePositionMargin() {
 
 	amount := "100.0"
 	actionType := 1
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"symbol":       symbol,
 			"positionSide": positionSide,
 			"amount":       amount,
@@ -98,8 +100,8 @@ func (s *positionServiceTestSuite) TestChangePositionMode() {
 	}`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{
 			"dualSidePosition": "true",
 		})
 		s.assertRequestEqual(e, r)
@@ -114,8 +116,8 @@ func (s *positionServiceTestSuite) TestGetPositionMode() {
 	}`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setFormParams(params{})
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetFormParams(common.Params{})
 		s.assertRequestEqual(e, r)
 	})
 	res, err := s.client.NewGetPositionModeService().Do(newContext())

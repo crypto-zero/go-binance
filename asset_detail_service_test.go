@@ -3,6 +3,8 @@ package binance
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -34,7 +36,7 @@ func (s *withdrawServiceTestSuite) TestGetAssetDetail() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})

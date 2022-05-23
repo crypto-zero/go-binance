@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetAccountService get account info
@@ -9,15 +11,11 @@ type GetAccountService struct {
 	c *Client
 }
 
-// Do send request
-func (s *GetAccountService) Do(ctx context.Context, opts ...RequestOption) (res *Account, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/api/v3/account",
-		secType:  secTypeSigned,
-	}
+// Do send Request
+func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
+	r := common.NewGetRequestSigned("/api/v3/account")
 	res = new(Account)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -78,26 +76,22 @@ func (s *GetAccountSnapshotService) Limit(limit int) *GetAccountSnapshotService 
 	return s
 }
 
-// Do send request
-func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...RequestOption) (res *Snapshot, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/accountSnapshot",
-		secType:  secTypeSigned,
-	}
-	r.setParam("type", s.accountType)
+// Do send Request
+func (s *GetAccountSnapshotService) Do(ctx context.Context, opts ...common.RequestOption) (res *Snapshot, err error) {
+	r := common.NewGetRequestSigned("/sapi/v1/accountSnapshot")
+	r.SetQuery("type", s.accountType)
 
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	res = new(Snapshot)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return &Snapshot{}, err
 	}
 	return res, nil
@@ -168,16 +162,13 @@ type APIRestrictionService struct {
 	c *Client
 }
 
-// Do send request
-func (s *APIRestrictionService) Do(ctx context.Context, opts ...RequestOption) (
-	res *APIRestriction, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/account/apiRestrictions",
-		secType:  secTypeSigned,
-	}
+// Do send Request
+func (s *APIRestrictionService) Do(ctx context.Context, opts ...common.RequestOption) (
+	res *APIRestriction, err error,
+) {
+	r := common.NewGetRequestSigned("/sapi/v1/account/apiRestrictions")
 	res = new(APIRestriction)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

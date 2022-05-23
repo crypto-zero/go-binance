@@ -2,6 +2,8 @@ package binance
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // CreateMarginOrderService create order
@@ -100,14 +102,10 @@ func (s *CreateMarginOrderService) SideEffectType(sideEffectType SideEffectType)
 	return s
 }
 
-// Do send request
-func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CreateOrderResponse, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
-	}
-	m := params{
+// Do send Request
+func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CreateOrderResponse, err error) {
+	r := common.NewPostRequestSigned("/sapi/v1/margin/order")
+	m := common.Params{
 		"symbol": s.symbol,
 		"side":   s.side,
 		"type":   s.orderType,
@@ -146,10 +144,10 @@ func (s *CreateMarginOrderService) Do(ctx context.Context, opts ...RequestOption
 	if s.sideEffectType != nil {
 		m["sideEffectType"] = *s.sideEffectType
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
 	res = new(CreateOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -195,29 +193,25 @@ func (s *CancelMarginOrderService) NewClientOrderID(newClientOrderID string) *Ca
 	return s
 }
 
-// Do send request
-func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *CancelMarginOrderResponse, err error) {
-	r := &request{
-		method:   "DELETE",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
-	}
-	r.setFormParam("symbol", s.symbol)
+// Do send Request
+func (s *CancelMarginOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *CancelMarginOrderResponse, err error) {
+	r := common.NewDeleteRequestSigned("/sapi/v1/margin/order")
+	r.SetForm("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setFormParam("orderId", *s.orderID)
+		r.SetForm("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setFormParam("origClientOrderId", *s.origClientOrderID)
+		r.SetForm("origClientOrderId", *s.origClientOrderID)
 	}
 	if s.newClientOrderID != nil {
-		r.setFormParam("newClientOrderId", *s.newClientOrderID)
+		r.SetForm("newClientOrderId", *s.newClientOrderID)
 	}
 	if s.isIsolated {
-		r.setFormParam("isIsolated", "TRUE")
+		r.SetForm("isIsolated", "TRUE")
 	}
 
 	res = new(CancelMarginOrderResponse)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -256,26 +250,22 @@ func (s *GetMarginOrderService) OrigClientOrderID(origClientOrderID string) *Get
 	return s
 }
 
-// Do send request
-func (s *GetMarginOrderService) Do(ctx context.Context, opts ...RequestOption) (res *Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/order",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *GetMarginOrderService) Do(ctx context.Context, opts ...common.RequestOption) (res *Order, err error) {
+	r := common.NewGetRequestSigned("/sapi/v1/margin/order")
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.origClientOrderID != nil {
-		r.setParam("origClientOrderId", *s.origClientOrderID)
+		r.SetQuery("origClientOrderId", *s.origClientOrderID)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = new(Order)
-	if err = s.c.callAPI(ctx, r, res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -300,22 +290,18 @@ func (s *ListMarginOpenOrdersService) IsIsolated(isIsolated bool) *ListMarginOpe
 	return s
 }
 
-// Do send request
-func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/openOrders",
-		secType:  secTypeSigned,
-	}
+// Do send Request
+func (s *ListMarginOpenOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/sapi/v1/margin/openOrders")
 	if s.symbol != "" {
-		r.setParam("symbol", s.symbol)
+		r.SetQuery("symbol", s.symbol)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = make([]*Order, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil
@@ -368,32 +354,28 @@ func (s *ListMarginOrdersService) Limit(limit int) *ListMarginOrdersService {
 	return s
 }
 
-// Do send request
-func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...RequestOption) (res []*Order, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/sapi/v1/margin/allOrders",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+// Do send Request
+func (s *ListMarginOrdersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*Order, err error) {
+	r := common.NewGetRequestSigned("/sapi/v1/margin/allOrders")
+	r.SetQuery("symbol", s.symbol)
 	if s.orderID != nil {
-		r.setParam("orderId", *s.orderID)
+		r.SetQuery("orderId", *s.orderID)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 	if s.isIsolated {
-		r.setParam("isIsolated", "TRUE")
+		r.SetQuery("isIsolated", "TRUE")
 	}
 
 	res = make([]*Order, 0)
-	if err := s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err := s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

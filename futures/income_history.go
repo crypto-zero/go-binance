@@ -2,6 +2,8 @@ package futures
 
 import (
 	"context"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // GetIncomeHistoryService get position margin history service
@@ -45,28 +47,24 @@ func (s *GetIncomeHistoryService) Limit(limit int64) *GetIncomeHistoryService {
 }
 
 // Do send request
-func (s *GetIncomeHistoryService) Do(ctx context.Context, opts ...RequestOption) (res []*IncomeHistory, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/fapi/v1/income",
-		secType:  secTypeSigned,
-	}
-	r.setParam("symbol", s.symbol)
+func (s *GetIncomeHistoryService) Do(ctx context.Context, opts ...common.RequestOption) (res []*IncomeHistory, err error) {
+	r := common.NewGetRequestSigned("/fapi/v1/income")
+	r.SetQuery("symbol", s.symbol)
 	if s.incomeType != "" {
-		r.setParam("incomeType", s.incomeType)
+		r.SetQuery("incomeType", s.incomeType)
 	}
 	if s.startTime != nil {
-		r.setParam("startTime", *s.startTime)
+		r.SetQuery("startTime", *s.startTime)
 	}
 	if s.endTime != nil {
-		r.setParam("endTime", *s.endTime)
+		r.SetQuery("endTime", *s.endTime)
 	}
 	if s.limit != nil {
-		r.setParam("limit", *s.limit)
+		r.SetQuery("limit", *s.limit)
 	}
 
 	res = make([]*IncomeHistory, 0)
-	if err = s.c.callAPI(ctx, r, &res, opts...); err != nil {
+	if err = s.c.CallAPI(ctx, r, &res, opts...); err != nil {
 		return nil, err
 	}
 	return res, nil

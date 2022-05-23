@@ -3,6 +3,7 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -34,7 +35,7 @@ func (s *tickerServiceTestSuite) TestListBookTickers() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -74,8 +75,8 @@ func (s *tickerServiceTestSuite) TestSingleBookTicker() {
 
 	symbol := "LTCBTC"
 
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 
@@ -116,7 +117,7 @@ func (s *tickerServiceTestSuite) TestListPrices() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -146,8 +147,8 @@ func (s *tickerServiceTestSuite) TestListSinglePrice() {
 	defer s.assertDo()
 
 	symbol := "LTCBTC"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 
@@ -192,8 +193,8 @@ func (s *tickerServiceTestSuite) TestPriceChangeStats() {
 	defer s.assertDo()
 
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParam("symbol", symbol)
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQuery("symbol", symbol)
 		s.assertRequestEqual(e, r)
 	})
 	stats, err := s.client.NewListPriceChangeStatsService().Symbol(symbol).Do(newContext())
@@ -266,7 +267,7 @@ func (s *tickerServiceTestSuite) TestListPriceChangeStats() {
 	s.mockDo(data, nil)
 	defer s.assertDo()
 
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newRequest()
 		s.assertRequestEqual(e, r)
 	})

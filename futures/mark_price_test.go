@@ -3,6 +3,8 @@ package futures
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -26,8 +28,8 @@ func (s *premiumIndexServiceTestSuite) TestGetPremiumIndex() {
 	defer s.assertDo()
 
 	symbol := "BTCUSDT"
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQueryParams(common.Params{
 			"symbol": symbol,
 		})
 		s.assertRequestEqual(e, r)
@@ -35,13 +37,14 @@ func (s *premiumIndexServiceTestSuite) TestGetPremiumIndex() {
 
 	res, err := s.client.NewPremiumIndexService().Symbol(symbol).Do(newContext())
 	s.r().NoError(err)
-	e := []*PremiumIndex{&PremiumIndex{
-		Symbol:          symbol,
-		MarkPrice:       "11012.80409769",
-		LastFundingRate: "-0.03750000",
-		NextFundingTime: int64(1562569200000),
-		Time:            int64(1562566020000),
-	},
+	e := []*PremiumIndex{
+		{
+			Symbol:          symbol,
+			MarkPrice:       "11012.80409769",
+			LastFundingRate: "-0.03750000",
+			NextFundingTime: int64(1562569200000),
+			Time:            int64(1562566020000),
+		},
 	}
 	s.assertPremiumIndexEqual(e, res)
 }
@@ -85,8 +88,8 @@ func (s *fundingRateServiceTestSuite) TestGetFundingRate() {
 	startTime := int64(1576566020000)
 	endTime := int64(1676566020000)
 	limit := 10
-	s.assertReq(func(r *request) {
-		e := newRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newRequest().SetQueryParams(common.Params{
 			"symbol":    symbol,
 			"startTime": startTime,
 			"endTime":   endTime,
@@ -153,8 +156,8 @@ func (s *getLeverageBracketServiceTestSuite) TestGetLeverageBracket() {
 
 	symbol := "ETHUSDT"
 
-	s.assertReq(func(r *request) {
-		e := newSignedRequest().setParams(params{
+	s.assertReq(func(r *common.Request) {
+		e := newSignedRequest().SetQueryParams(common.Params{
 			"symbol": symbol,
 		})
 		s.assertRequestEqual(e, r)
