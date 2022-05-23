@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ChangeLeverageService change user's initial leverage of specific symbol market
@@ -25,17 +27,13 @@ func (s *ChangeLeverageService) Leverage(leverage int) *ChangeLeverageService {
 }
 
 // Do send request
-func (s *ChangeLeverageService) Do(ctx context.Context, opts ...RequestOption) (res *SymbolLeverage, err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/dapi/v1/leverage",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangeLeverageService) Do(ctx context.Context, opts ...common.RequestOption) (res *SymbolLeverage, err error) {
+	r := common.NewPostRequestSigned("/dapi/v1/leverage")
+	r.SetFormParams(common.Params{
 		"symbol":   s.symbol,
 		"leverage": s.leverage,
 	})
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -74,17 +72,13 @@ func (s *ChangeMarginTypeService) MarginType(marginType MarginType) *ChangeMargi
 }
 
 // Do send request
-func (s *ChangeMarginTypeService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/dapi/v1/marginType",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangeMarginTypeService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/dapi/v1/marginType")
+	r.SetFormParams(common.Params{
 		"symbol":     s.symbol,
 		"marginType": s.marginType,
 	})
-	_, err = s.c.callAPI(ctx, r, opts...)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return err
 	}
@@ -125,13 +119,9 @@ func (s *UpdatePositionMarginService) Type(actionType int) *UpdatePositionMargin
 }
 
 // Do send request
-func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/dapi/v1/positionMargin",
-		secType:  secTypeSigned,
-	}
-	m := params{
+func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/dapi/v1/positionMargin")
+	m := common.Params{
 		"symbol": s.symbol,
 		"amount": s.amount,
 		"type":   s.actionType,
@@ -139,9 +129,9 @@ func (s *UpdatePositionMarginService) Do(ctx context.Context, opts ...RequestOpt
 	if s.positionSide != nil {
 		m["positionSide"] = *s.positionSide
 	}
-	r.setFormParams(m)
+	r.SetFormParams(m)
 
-	_, err = s.c.callAPI(ctx, r, opts...)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return err
 	}
@@ -165,16 +155,12 @@ func (s *ChangePositionModeService) DualSide(dualSide bool) *ChangePositionModeS
 }
 
 // Do send request
-func (s *ChangePositionModeService) Do(ctx context.Context, opts ...RequestOption) (err error) {
-	r := &request{
-		method:   "POST",
-		endpoint: "/dapi/v1/positionSide/dual",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{
+func (s *ChangePositionModeService) Do(ctx context.Context, opts ...common.RequestOption) (err error) {
+	r := common.NewPostRequestSigned("/dapi/v1/positionSide/dual")
+	r.SetFormParams(common.Params{
 		"dualSidePosition": s.dualSide,
 	})
-	_, err = s.c.callAPI(ctx, r, opts...)
+	_, err = s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return err
 	}
@@ -192,14 +178,10 @@ type PositionMode struct {
 }
 
 // Do send request
-func (s *GetPositionModeService) Do(ctx context.Context, opts ...RequestOption) (res *PositionMode, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/positionSide/dual",
-		secType:  secTypeSigned,
-	}
-	r.setFormParams(params{})
-	data, err := s.c.callAPI(ctx, r, opts...)
+func (s *GetPositionModeService) Do(ctx context.Context, opts ...common.RequestOption) (res *PositionMode, err error) {
+	r := common.NewGetRequestSigned("/dapi/v1/positionSide/dual")
+	r.SetFormParams(common.Params{})
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}

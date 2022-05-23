@@ -114,12 +114,12 @@ func (c *client) prepareRequest(r *Request, opts ...RequestOption) (bodyString,
 	return bodyString, fURL.String(), header, nil
 }
 
-func (c *client) CallAPI(ctx context.Context, r *Request, result interface{},
-	opts ...RequestOption,
-) (err error) {
+func (c *client) CallAPIBytes(ctx context.Context, r *Request, opts ...RequestOption) (
+	data []byte, err error,
+) {
 	body, fullURL, headers, err := c.prepareRequest(r, opts...)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var inBody io.Reader
@@ -128,7 +128,7 @@ func (c *client) CallAPI(ctx context.Context, r *Request, result interface{},
 	}
 	req, err := http.NewRequest(r.Method, fullURL, inBody)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req = req.WithContext(ctx)
 	req.Header = headers
@@ -142,12 +142,12 @@ func (c *client) CallAPI(ctx context.Context, r *Request, result interface{},
 
 	res, err := f(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
+	data, err = ioutil.ReadAll(res.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer func() {
@@ -166,20 +166,31 @@ func (c *client) CallAPI(ctx context.Context, r *Request, result interface{},
 		if e := json.Unmarshal(data, apiErr); e != nil {
 			c.logger.Debugw("call api parse error failed", "id", r.ID, "err", e)
 		}
-		return apiErr
+		return nil, apiErr
+	}
+	return data, nil
+}
+
+func (c *client) CallAPI(ctx context.Context, r *Request, result interface{},
+	opts ...RequestOption,
+) (err error) {
+	data, err := c.CallAPIBytes(ctx, r, opts...)
+	if err != nil {
+		return err
+	}
+	if result == nil {
+		return nil
 	}
 
-	if result != nil {
-		f, ok := result.(func(data []byte) error)
-		if ok {
-			if err = f(data); err != nil {
-				return err
-			}
-			return nil
-		}
-		if err = json.Unmarshal(data, result); err != nil {
+	f, ok := result.(func(data []byte) error)
+	if ok {
+		if err = f(data); err != nil {
 			return err
 		}
+		return nil
+	}
+	if err = json.Unmarshal(data, result); err != nil {
+		return err
 	}
 	return nil
 }
@@ -189,6 +200,7 @@ type Client interface {
 	UpdateTimeOffset(offset int64)
 	UpdateDoFunc(f DoFunc)
 	UpdateHTTPClient(hc *http.Client)
+	CallAPIBytes(ctx context.Context, r *Request, opts ...RequestOption) (data []byte, err error)
 	CallAPI(ctx context.Context, r *Request, result interface{}, opts ...RequestOption) (err error)
 }
 

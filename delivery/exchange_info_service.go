@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ExchangeInfoService exchange info service
@@ -11,13 +13,9 @@ type ExchangeInfoService struct {
 }
 
 // Do send request
-func (s *ExchangeInfoService) Do(ctx context.Context, opts ...RequestOption) (res *ExchangeInfo, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/exchangeInfo",
-		secType:  secTypeNone,
-	}
-	data, err := s.c.callAPI(ctx, r, opts...)
+func (s *ExchangeInfoService) Do(ctx context.Context, opts ...common.RequestOption) (res *ExchangeInfo, err error) {
+	r := common.NewGetRequestPublic("/dapi/v1/exchangeInfo")
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return nil, err
 	}

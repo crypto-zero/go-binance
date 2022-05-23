@@ -3,6 +3,8 @@ package delivery
 import (
 	"testing"
 
+	"github.com/crypto-zero/go-binance/v2/common"
+
 	"github.com/stretchr/testify/suite"
 )
 
@@ -29,7 +31,7 @@ func (s *accountServiceTestSuite) TestetBalance() {
 	]`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})
@@ -129,7 +131,7 @@ func (s *accountServiceTestSuite) TestetAccount() {
 	}`)
 	s.mockDo(data, nil)
 	defer s.assertDo()
-	s.assertReq(func(r *request) {
+	s.assertReq(func(r *common.Request) {
 		e := newSignedRequest()
 		s.assertRequestEqual(e, r)
 	})

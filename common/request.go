@@ -149,6 +149,10 @@ func NewPutRequestAPIKey(endpoint string) *Request {
 	return NewPutRequest(endpoint, SecTypeAPIKey)
 }
 
+func NewPutRequestSigned(endpoint string) *Request {
+	return NewPutRequest(endpoint, SecTypeSigned)
+}
+
 func NewDeleteRequest(endpoint string, secType SecType) *Request {
 	return NewRequest(http.MethodDelete, endpoint, secType)
 }

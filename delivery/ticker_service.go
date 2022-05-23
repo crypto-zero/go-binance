@@ -3,6 +3,8 @@ package delivery
 import (
 	"context"
 	"encoding/json"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // ListBookTickersService list best price/qty on the order book for a symbol or symbols.
@@ -25,19 +27,16 @@ func (s *ListBookTickersService) Pair(pair string) *ListBookTickersService {
 }
 
 // Do send request.
-func (s *ListBookTickersService) Do(ctx context.Context, opts ...RequestOption) (res []*BookTicker, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/ticker/bookTicker",
-	}
+func (s *ListBookTickersService) Do(ctx context.Context, opts ...common.RequestOption) (res []*BookTicker, err error) {
+	r := common.NewGetRequestPublic("/dapi/v1/ticker/bookTicker")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 	if s.pair != nil {
-		r.setParam("pair", *s.pair)
+		r.SetQuery("pair", *s.pair)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*BookTicker{}, err
 	}
@@ -79,19 +78,16 @@ func (s *ListPricesService) Pair(pair string) *ListPricesService {
 }
 
 // Do send request.
-func (s *ListPricesService) Do(ctx context.Context, opts ...RequestOption) (res []*SymbolPrice, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/ticker/price",
-	}
+func (s *ListPricesService) Do(ctx context.Context, opts ...common.RequestOption) (res []*SymbolPrice, err error) {
+	r := common.NewGetRequestPublic("/dapi/v1/ticker/price")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 	if s.pair != nil {
-		r.setParam("pair", *s.pair)
+		r.SetQuery("pair", *s.pair)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return []*SymbolPrice{}, err
 	}
@@ -130,19 +126,16 @@ func (s *ListPriceChangeStatsService) Pair(pair string) *ListPriceChangeStatsSer
 }
 
 // Do send request.
-func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...RequestOption) (res []*PriceChangeStats, err error) {
-	r := &request{
-		method:   "GET",
-		endpoint: "/dapi/v1/ticker/24hr",
-	}
+func (s *ListPriceChangeStatsService) Do(ctx context.Context, opts ...common.RequestOption) (res []*PriceChangeStats, err error) {
+	r := common.NewGetRequestPublic("/dapi/v1/ticker/24hr")
 	if s.symbol != nil {
-		r.setParam("symbol", *s.symbol)
+		r.SetQuery("symbol", *s.symbol)
 	}
 	if s.pair != nil {
-		r.setParam("pair", *s.pair)
+		r.SetQuery("pair", *s.pair)
 	}
 
-	data, err := s.c.callAPI(ctx, r, opts...)
+	data, err := s.c.CallAPIBytes(ctx, r, opts...)
 	if err != nil {
 		return res, err
 	}
