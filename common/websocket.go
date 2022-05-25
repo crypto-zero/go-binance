@@ -14,6 +14,7 @@ type WebsocketMessageCallback func(messageType websocket.MessageType, data []byt
 
 type websocketClient struct {
 	*websocket.Conn
+	ctx          context.Context
 	writerBuffer chan []byte
 	pingBuffer   chan struct{}
 }
@@ -29,9 +30,7 @@ func (wc *websocketClient) Write(data []byte) {
 	wc.writerBuffer <- data
 }
 
-func (wc *websocketClient) Loop(ctx context.Context, f WebsocketMessageCallback) error {
-	ctx, cancel := context.WithCancel(ctx)
-
+func (wc *websocketClient) Loop(f WebsocketMessageCallback) error {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
@@ -51,28 +50,17 @@ func (wc *websocketClient) Loop(ctx context.Context, f WebsocketMessageCallback)
 		}()
 	}
 
-	run(func() error { return wc.writeLoop(ctx) })
-	run(func() error { return wc.readLoop(ctx, f) })
-	run(func() error { return wc.pingLoop(ctx) })
+	run(func() error { return wc.writeLoop(wc.ctx) })
+	run(func() error { return wc.readLoop(wc.ctx, f) })
+	run(func() error { return wc.pingLoop(wc.ctx) })
 
 	err := <-c
-	cancel()
 	wg.Wait()
 
-	var ce websocket.CloseError
-	if errors.As(err, &ce) && ce.Code == websocket.StatusNormalClosure &&
-		ce.Reason == "wsc request close" {
+	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 		return nil
 	}
 	return err
-}
-
-func (wc *websocketClient) Close() error {
-	err := wc.Conn.Close(websocket.StatusNormalClosure, "wsc request close")
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (wc *websocketClient) writeLoop(ctx context.Context) (err error) {
@@ -122,10 +110,9 @@ func (wc *websocketClient) pingLoop(ctx context.Context) (err error) {
 }
 
 type WebsocketClient interface {
-	Loop(ctx context.Context, f WebsocketMessageCallback) error
+	Loop(f WebsocketMessageCallback) error
 	Ping()
 	Write(data []byte)
-	Close() error
 }
 
 func WebsocketDial(ctx context.Context, url string, httpClient *http.Client) (
@@ -138,6 +125,7 @@ func WebsocketDial(ctx context.Context, url string, httpClient *http.Client) (
 	}
 	cli := &websocketClient{
 		Conn:         conn,
+		ctx:          ctx,
 		writerBuffer: make(chan []byte, 100),
 		pingBuffer:   make(chan struct{}, 0),
 	}

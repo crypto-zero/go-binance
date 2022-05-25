@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 	"testing"
-	"time"
 
 	"nhooyr.io/websocket"
 )
@@ -16,7 +15,7 @@ func TestWebsocketConnection(t *testing.T) {
 		return
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 	url := "wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self"
 
 	cli, err := WebsocketDial(ctx, url, nil)
@@ -36,7 +35,7 @@ func TestWebsocketConnection(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err = cli.Loop(ctx, f); err != nil {
+		if err = cli.Loop(f); err != nil {
 			panic(err)
 		} else {
 			done <- struct{}{}
@@ -44,18 +43,12 @@ func TestWebsocketConnection(t *testing.T) {
 	}()
 
 	cli.Ping()
-	cli.Ping()
-	cli.Ping()
-	cli.Ping()
-	cli.Ping()
-
-	time.Sleep(time.Minute)
-
 	cli.Write([]byte("hello world"))
 
 	<-done
-	if err = cli.Close(); err != nil {
-		panic(err)
-	}
+
+	// request client to close
+	cancel()
+
 	wg.Wait()
 }

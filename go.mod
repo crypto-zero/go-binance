@@ -6,6 +6,7 @@ require (
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/stretchr/testify v1.7.1
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	nhooyr.io/websocket v1.8.7
 )
 
