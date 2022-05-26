@@ -37,7 +37,8 @@ func TestWebsocketConnection(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		if err = cli.Loop(f); err != nil {
-			t.Fatal(err)
+			t.Error(err)
+			return
 		} else {
 			done <- struct{}{}
 		}
@@ -52,4 +53,5 @@ func TestWebsocketConnection(t *testing.T) {
 	cancel()
 
 	wg.Wait()
+	t.Log(cli.Delay())
 }

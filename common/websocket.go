@@ -15,6 +15,7 @@ type WebsocketMessageCallback func(messageType websocket.MessageType, data []byt
 type websocketClient struct {
 	*websocket.Conn
 	ctx          context.Context
+	delay        time.Duration
 	writerBuffer chan []byte
 	pingBuffer   chan struct{}
 }
@@ -24,6 +25,10 @@ func (wc *websocketClient) Ping() {
 	case wc.pingBuffer <- struct{}{}:
 	default:
 	}
+}
+
+func (wc *websocketClient) Delay() time.Duration {
+	return wc.delay
 }
 
 func (wc *websocketClient) Write(data []byte) {
@@ -100,13 +105,17 @@ func (wc *websocketClient) pingLoop(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-wc.pingBuffer:
+			from := time.Now()
 			if err = wc.Conn.Ping(ctx); err != nil {
 				return err
 			}
+			wc.delay = time.Since(from)
 		case <-t.C:
+			from := time.Now()
 			if err = wc.Conn.Ping(ctx); err != nil {
 				return err
 			}
+			wc.delay = time.Since(from)
 			t.Reset(d)
 		}
 	}
@@ -114,6 +123,7 @@ func (wc *websocketClient) pingLoop(ctx context.Context) (err error) {
 
 type WebsocketClient interface {
 	Loop(f WebsocketMessageCallback) error
+	Delay() time.Duration
 	Ping()
 	Write(data []byte)
 }
