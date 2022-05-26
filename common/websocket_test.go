@@ -20,7 +20,8 @@ func TestWebsocketConnection(t *testing.T) {
 
 	cli, err := WebsocketDial(ctx, url, nil)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
+		return
 	}
 
 	done := make(chan struct{}, 2)
@@ -36,7 +37,7 @@ func TestWebsocketConnection(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		if err = cli.Loop(f); err != nil {
-			panic(err)
+			t.Fatal(err)
 		} else {
 			done <- struct{}{}
 		}

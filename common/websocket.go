@@ -31,6 +31,8 @@ func (wc *websocketClient) Write(data []byte) {
 }
 
 func (wc *websocketClient) Loop(f WebsocketMessageCallback) error {
+	ctx, cancel := context.WithCancel(wc.ctx)
+
 	var wg sync.WaitGroup
 	wg.Add(3)
 
@@ -50,11 +52,12 @@ func (wc *websocketClient) Loop(f WebsocketMessageCallback) error {
 		}()
 	}
 
-	run(func() error { return wc.writeLoop(wc.ctx) })
-	run(func() error { return wc.readLoop(wc.ctx, f) })
-	run(func() error { return wc.pingLoop(wc.ctx) })
+	run(func() error { return wc.writeLoop(ctx) })
+	run(func() error { return wc.readLoop(ctx, f) })
+	run(func() error { return wc.pingLoop(ctx) })
 
 	err := <-c
+	cancel()
 	wg.Wait()
 
 	if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
