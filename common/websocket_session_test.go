@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 )
@@ -47,7 +48,17 @@ func TestWebsocketSession(t *testing.T) {
 	session := NewWebsocketSession(cli, handler)
 	go session.Loop()
 
-	reply, err := session.Subscribe(ctx, "btcusdt@markPrice")
+	symbols := []string{
+		"bnbusdt", "btcusdt", "etcusdt", "lunausdt", "ethusdt", "linkusdt",
+		"eosusdt", "ltcusdt", "bchusdt", "dashusdt", "ontusdt", "neousdt",
+	}
+
+	var streams []string
+	for _, s := range symbols {
+		streams = append(streams, fmt.Sprintf("%s@markPrice", s))
+	}
+
+	reply, err := session.Subscribe(ctx, streams...)
 	if err != nil {
 		t.Fatal(err)
 		return
