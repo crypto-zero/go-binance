@@ -10,7 +10,8 @@ type testSessionHandler struct {
 	*testing.T
 	done chan struct{}
 
-	aggTrade, markPrice, kline, continuousKline, miniMarketTicker bool
+	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
+	marketTicker bool
 
 	markPriceCount int
 }
@@ -55,9 +56,15 @@ func (t *testSessionHandler) OnMiniMarketTicker(ticker *WsMiniMarketTickerEvent)
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnMarketTicker(ticker *WsMarketTickerEvent) {
+	t.Logf("got market ticker event: %#v\n", ticker)
+	t.marketTicker = true
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		t.markPriceCount < 10 || t.done == nil {
+		!t.marketTicker || t.markPriceCount < 10 || t.done == nil {
 		return
 	}
 	close(t.done)
@@ -100,6 +107,12 @@ func TestSession(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err = session.SubscribeAllMiniMarketTicker(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeMarketTicker(ctx, "BTCUSDT", "BNBUSDT"); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeAllMarketTicker(ctx); err != nil {
 		t.Fatal(err)
 	}
 
