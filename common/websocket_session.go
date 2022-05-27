@@ -38,6 +38,7 @@ type WebsocketSession interface {
 	// RunLoop create new go routine and call IOLoop function.
 	RunLoop() chan error
 	Subscribe(ctx context.Context, streams ...string) (reply *WebsocketReply, err error)
+	SubscribeNoReply(ctx context.Context, streams ...string) (err error)
 	RegisterMessageHandler(checker WebsocketSessionMessageChecker, factory WebsocketSessionMessageFactory,
 		callback WebsocketSessionMessageCallback)
 	RequireMapHasAllKeys(keys ...string) WebsocketSessionMessageChecker
@@ -132,6 +133,17 @@ func (ws *websocketSession) processMessage(m interface{}, data []byte) (err erro
 			p.Callback(x)
 			return nil
 		}
+	case []interface{}:
+		var list []json.RawMessage
+		if err = json.Unmarshal(data, &list); err != nil {
+			return err
+		}
+		for idx, x := range result {
+			if err = ws.processMessage(x, list[idx]); err != nil {
+				return err
+			}
+		}
+		return nil
 	}
 	return ws.handler.OnUnknownMessage(data, m)
 }
@@ -217,4 +229,15 @@ func (ws *websocketSession) Subscribe(ctx context.Context, streams ...string) (
 	case err = <-request.done:
 		return &request.reply, err
 	}
+}
+
+func (ws *websocketSession) SubscribeNoReply(ctx context.Context, streams ...string) (err error) {
+	reply, err := ws.Subscribe(ctx, streams...)
+	if err != nil {
+		return err
+	}
+	if err = reply.OK(); err != nil {
+		return err
+	}
+	return nil
 }

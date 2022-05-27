@@ -16,7 +16,8 @@ type Session struct {
 
 type SessionHandler interface {
 	common.WebsocketSessionHandler
-	OnAggTradeEvent(*WsAggTradeEvent)
+	OnAggTrade(*WsAggTradeEvent)
+	OnMarkPrice(*WsMarkPriceEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -24,14 +25,19 @@ func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err 
 	for _, s := range symbol {
 		streams = append(streams, fmt.Sprintf("%s@aggTrade", strings.ToLower(s)))
 	}
-	reply, err := s.Subscribe(ctx, streams...)
-	if err != nil {
-		return err
+	return s.SubscribeNoReply(ctx, streams...)
+}
+
+func (s *Session) SubscribeMarkPrice(ctx context.Context, symbol ...string) (err error) {
+	var streams []string
+	for _, s := range symbol {
+		streams = append(streams, fmt.Sprintf("%s@markPrice", strings.ToLower(s)))
 	}
-	if err = reply.OK(); err != nil {
-		return err
-	}
-	return nil
+	return s.SubscribeNoReply(ctx, streams...)
+}
+
+func (s *Session) SubscribeAllMarkPrice(ctx context.Context) error {
+	return s.SubscribeNoReply(ctx, "!markPrice@arr@1s")
 }
 
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
@@ -59,11 +65,16 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 	session.WebsocketSession = common.NewWebsocketSession(cli, handler)
 	session.handler = handler
 
-	// for WsAggTradeEvent message handler
 	session.RegisterMessageHandler(
 		session.RequireMapHasAllKeys("e", "E", "s", "a", "p", "q", "f", "l", "T", "m"),
 		common.WebsocketSessionMessageFactoryBuild[WsAggTradeEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnAggTradeEvent),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnAggTrade),
+	)
+
+	session.RegisterMessageHandler(
+		session.RequireMapHasAllKeys("e", "E", "s", "p", "i", "P", "r", "T"),
+		common.WebsocketSessionMessageFactoryBuild[WsMarkPriceEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnMarkPrice),
 	)
 	return session, nil
 }
