@@ -173,6 +173,15 @@ type WsKlineEvent struct {
 	Kline  WsKline `json:"k"`
 }
 
+// WsContinuousKlineEvent define websocket continuous kline event
+type WsContinuousKlineEvent struct {
+	Event        string  `json:"e"`
+	Time         int64   `json:"E"`
+	BaseSymbol   string  `json:"ps"`
+	ContractType string  `json:"ct"`
+	Kline        WsKline `json:"k"`
+}
+
 // WsKline define websocket kline
 type WsKline struct {
 	StartTime            int64  `json:"t"`

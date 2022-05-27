@@ -19,6 +19,7 @@ type SessionHandler interface {
 	OnAggTrade(*WsAggTradeEvent)
 	OnMarkPrice(*WsMarkPriceEvent)
 	OnKline(*WsKlineEvent)
+	OnContinuousKline(*WsContinuousKlineEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -43,6 +44,18 @@ func (s *Session) SubscribeAllMarkPrice(ctx context.Context) error {
 
 func (s *Session) SubscribeKline(ctx context.Context, symbol string, interval KlineInterval) error {
 	return s.SubscribeNoReply(ctx, fmt.Sprintf("%s@kline_%s", strings.ToLower(symbol), interval))
+}
+
+func (s *Session) SubscribeContinuousKline(ctx context.Context, symbol string,
+	contractType ContractType, interval KlineInterval,
+) error {
+	return s.SubscribeNoReply(
+		ctx,
+		fmt.Sprintf(
+			"%s_%s@continuousKline_%s",
+			strings.ToLower(symbol), strings.ToLower(string(contractType)), interval,
+		),
+	)
 }
 
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
@@ -84,6 +97,11 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 		common.WebsocketSessionMessageFactoryBuild[WsKlineEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnKline),
 		session.RequireMapKeyValue("e", "kline"),
+	)
+	session.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsContinuousKlineEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnContinuousKline),
+		session.RequireMapKeyValue("e", "continuous_kline"),
 	)
 	return session, nil
 }
