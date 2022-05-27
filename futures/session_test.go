@@ -10,8 +10,9 @@ type testSessionHandler struct {
 	*testing.T
 	done chan struct{}
 
-	aggTrade, markPrice bool
-	markPriceCount      int
+	aggTrade, markPrice, kline bool
+
+	markPriceCount int
 }
 
 func (t *testSessionHandler) OnUnknownMessage(bytes []byte, i interface{}) error {
@@ -36,8 +37,15 @@ func (t *testSessionHandler) OnMarkPrice(event *WsMarkPriceEvent) {
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnKline(line *WsKlineEvent) {
+	t.Logf("got kline event: %#v\n", line)
+	t.kline = true
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
-	if !t.aggTrade || !t.markPrice || t.markPriceCount < 10 || t.done == nil {
+	if !t.aggTrade || !t.markPrice || !t.kline ||
+		t.markPriceCount < 10 || t.done == nil {
 		return
 	}
 	close(t.done)
@@ -67,6 +75,9 @@ func TestSession(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err = session.SubscribeAllMarkPrice(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeKline(ctx, "BTCUSDT", KlineInterval1Minute); err != nil {
 		t.Fatal(err)
 	}
 
