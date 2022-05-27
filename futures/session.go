@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"strings"
 
 	"github.com/crypto-zero/go-binance/v2/common"
 )
@@ -16,6 +17,21 @@ type Session struct {
 type SessionHandler interface {
 	common.WebsocketSessionHandler
 	OnAggTradeEvent(*WsAggTradeEvent)
+}
+
+func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
+	var streams []string
+	for _, s := range symbol {
+		streams = append(streams, fmt.Sprintf("%s@aggTrade", strings.ToLower(s)))
+	}
+	reply, err := s.Subscribe(ctx, streams...)
+	if err != nil {
+		return err
+	}
+	if err = reply.OK(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
