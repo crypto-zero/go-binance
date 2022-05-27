@@ -179,6 +179,9 @@ func (ws *websocketSession) onRequestReply(data []byte) (err error) {
 
 	ws.requestLock.Lock()
 	request, ok := ws.pendingRequests[reply.ID]
+	if ok {
+		delete(ws.pendingRequests, reply.ID)
+	}
 	ws.requestLock.Unlock()
 
 	if !ok {

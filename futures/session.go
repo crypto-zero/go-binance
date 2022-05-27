@@ -22,6 +22,7 @@ type SessionHandler interface {
 	OnContinuousKline(*WsContinuousKlineEvent)
 	OnMiniMarketTicker(*WsMiniMarketTickerEvent)
 	OnMarketTicker(*WsMarketTickerEvent)
+	OnBookTicker(*WsBookTickerEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -84,6 +85,18 @@ func (s *Session) SubscribeAllMarketTicker(ctx context.Context) error {
 	return s.SubscribeNoReply(ctx, "!ticker@arr")
 }
 
+func (s *Session) SubscribeBookTicker(ctx context.Context, symbol ...string) error {
+	var streams []string
+	for _, s := range symbol {
+		streams = append(streams, fmt.Sprintf("%s@bookTicker", strings.ToLower(s)))
+	}
+	return s.SubscribeNoReply(ctx, streams...)
+}
+
+func (s *Session) SubscribeAllBookTicker(ctx context.Context) error {
+	return s.SubscribeNoReply(ctx, "!bookTicker")
+}
+
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
 	handler SessionHandler,
 ) (session *Session, err error) {
@@ -138,6 +151,11 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 		common.WebsocketSessionMessageFactoryBuild[WsMarketTickerEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnMarketTicker),
 		session.RequireMapKeyValue("e", "24hrTicker"),
+	)
+	session.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsBookTickerEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnBookTicker),
+		session.RequireMapKeyValue("e", "bookTicker"),
 	)
 	return session, nil
 }

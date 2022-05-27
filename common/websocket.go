@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"errors"
+	"math"
 	"net/http"
 	"net/url"
 	"sync"
@@ -137,6 +138,7 @@ func WebsocketDial(ctx context.Context, url string, httpClient *http.Client) (
 	if err != nil {
 		return nil, err
 	}
+	conn.SetReadLimit(math.MaxUint16)
 	cli := &websocketClient{
 		Conn:         conn,
 		ctx:          ctx,

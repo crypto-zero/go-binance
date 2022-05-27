@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"testing"
+	"time"
 )
 
 type testSessionHandler struct {
@@ -11,7 +12,7 @@ type testSessionHandler struct {
 	done chan struct{}
 
 	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
-	marketTicker bool
+	marketTicker, bookTicker bool
 
 	markPriceCount int
 }
@@ -26,45 +27,51 @@ func (t *testSessionHandler) OnClose(err error) {
 }
 
 func (t *testSessionHandler) OnAggTrade(event *WsAggTradeEvent) {
-	t.Logf("got agg trade event: %#v\n", event)
+	// t.Logf("got agg trade event: %#v\n", event)
 	t.aggTrade = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) OnMarkPrice(event *WsMarkPriceEvent) {
-	t.Logf("got mark price event: %#v\n", event)
+	// t.Logf("got mark price event: %#v\n", event)
 	t.markPrice = true
 	t.markPriceCount++
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) OnKline(line *WsKlineEvent) {
-	t.Logf("got kline event: %#v\n", line)
+	// t.Logf("got kline event: %#v\n", line)
 	t.kline = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) OnContinuousKline(line *WsContinuousKlineEvent) {
-	t.Logf("got continuous kline event: %#v\n", line)
+	// t.Logf("got continuous kline event: %#v\n", line)
 	t.continuousKline = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) OnMiniMarketTicker(ticker *WsMiniMarketTickerEvent) {
-	t.Logf("got mini market ticker event: %#v\n", ticker)
+	// t.Logf("got mini market ticker event: %#v\n", ticker)
 	t.miniMarketTicker = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) OnMarketTicker(ticker *WsMarketTickerEvent) {
-	t.Logf("got market ticker event: %#v\n", ticker)
+	// t.Logf("got market ticker event: %#v\n", ticker)
 	t.marketTicker = true
+	t.triggerDone()
+}
+
+func (t *testSessionHandler) OnBookTicker(ticker *WsBookTickerEvent) {
+	// t.Logf("got book ticker event: %#v\n", ticker)
+	t.bookTicker = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || t.markPriceCount < 10 || t.done == nil {
+		!t.marketTicker || !t.bookTicker || t.markPriceCount < 10 || t.done == nil {
 		return
 	}
 	close(t.done)
@@ -115,8 +122,20 @@ func TestSession(t *testing.T) {
 	if err = session.SubscribeAllMarketTicker(ctx); err != nil {
 		t.Fatal(err)
 	}
+	if err = session.SubscribeBookTicker(ctx, "BTCUSDT", "BNBUSDT"); err != nil {
+		t.Fatal(err)
+	}
 
-	<-handler.done
+	// sleep for a while
+	time.Sleep(time.Second)
+
+	if err = session.SubscribeAllBookTicker(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	if handler.done != nil {
+		<-handler.done
+	}
 
 	cancel()
 	if err = <-errC; err != nil {
