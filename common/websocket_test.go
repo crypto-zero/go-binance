@@ -36,11 +36,10 @@ func TestWebsocketConnection(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		if err = cli.Loop(f); err != nil {
+		err := cli.Loop(f)
+		done <- struct{}{}
+		if err != nil {
 			t.Error(err)
-			return
-		} else {
-			done <- struct{}{}
 		}
 	}()
 

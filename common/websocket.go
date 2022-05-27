@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -143,4 +144,11 @@ func WebsocketDial(ctx context.Context, url string, httpClient *http.Client) (
 		pingBuffer:   make(chan struct{}, 0),
 	}
 	return cli, nil
+}
+
+func WebsocketDialProxy(ctx context.Context, url string, proxyURL *url.URL) (
+	out WebsocketClient, err error,
+) {
+	hc := &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(proxyURL)}}
+	return WebsocketDial(ctx, url, hc)
 }

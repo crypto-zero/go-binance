@@ -13,8 +13,8 @@ type testWebsocketSessionHandler struct {
 	done         chan struct{}
 }
 
-func (t *testWebsocketSessionHandler) OnMessage(i interface{}) error {
-	t.t.Log(i)
+func (t *testWebsocketSessionHandler) OnUnknownMessage(data []byte, m interface{}) error {
+	t.t.Log(m)
 	t.messageCount++
 	if t.done != nil && t.messageCount >= 3 {
 		close(t.done)
