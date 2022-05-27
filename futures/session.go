@@ -66,15 +66,15 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 	session.handler = handler
 
 	session.RegisterMessageHandler(
-		session.RequireMapHasAllKeys("e", "E", "s", "a", "p", "q", "f", "l", "T", "m"),
 		common.WebsocketSessionMessageFactoryBuild[WsAggTradeEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnAggTrade),
+		session.RequireMapKeyValue("e", "aggTrade"),
 	)
 
 	session.RegisterMessageHandler(
-		session.RequireMapHasAllKeys("e", "E", "s", "p", "i", "P", "r", "T"),
 		common.WebsocketSessionMessageFactoryBuild[WsMarkPriceEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnMarkPrice),
+		session.RequireMapKeyValue("e", "markPriceUpdate"),
 	)
 	return session, nil
 }

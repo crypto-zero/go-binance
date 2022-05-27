@@ -39,9 +39,10 @@ type WebsocketSession interface {
 	RunLoop() chan error
 	Subscribe(ctx context.Context, streams ...string) (reply *WebsocketReply, err error)
 	SubscribeNoReply(ctx context.Context, streams ...string) (err error)
-	RegisterMessageHandler(checker WebsocketSessionMessageChecker, factory WebsocketSessionMessageFactory,
-		callback WebsocketSessionMessageCallback)
+	RegisterMessageHandler(factory WebsocketSessionMessageFactory, callback WebsocketSessionMessageCallback,
+		checker ...WebsocketSessionMessageChecker)
 	RequireMapHasAllKeys(keys ...string) WebsocketSessionMessageChecker
+	RequireMapKeyValue(key, value string) WebsocketSessionMessageChecker
 }
 
 type WebsocketSessionHandler interface {
@@ -69,7 +70,7 @@ func WebsocketSessionMessageHandlerBuild[T any](f func(*T)) WebsocketSessionMess
 }
 
 type websocketSessionMessagePattern struct {
-	Check    WebsocketSessionMessageChecker
+	Check    []WebsocketSessionMessageChecker
 	New      WebsocketSessionMessageFactory
 	Callback WebsocketSessionMessageCallback
 }
@@ -92,8 +93,26 @@ func (ws *websocketSession) RequireMapHasAllKeys(keys ...string) WebsocketSessio
 	}
 }
 
-func (ws *websocketSession) RegisterMessageHandler(checker WebsocketSessionMessageChecker,
-	factory WebsocketSessionMessageFactory, callback WebsocketSessionMessageCallback,
+func (ws *websocketSession) RequireMapKeyValue(key, value string) WebsocketSessionMessageChecker {
+	return func(m interface{}) bool {
+		switch result := m.(type) {
+		case map[string]interface{}:
+			x, ok := result[key]
+			if !ok {
+				return false
+			}
+			stringValue, ok := x.(string)
+			if !ok {
+				return false
+			}
+			return stringValue == value
+		}
+		return false
+	}
+}
+
+func (ws *websocketSession) RegisterMessageHandler(factory WebsocketSessionMessageFactory,
+	callback WebsocketSessionMessageCallback, checker ...WebsocketSessionMessageChecker,
 ) {
 	ws.messagePatterns = append(ws.messagePatterns, &websocketSessionMessagePattern{
 		Check:    checker,
@@ -122,9 +141,13 @@ func (ws *websocketSession) processMessage(m interface{}, data []byte) (err erro
 		if MapHasKeys(result, "id", "method", "code") {
 			return ws.onRequestReply(data)
 		}
+
+	CHECK_LOOP:
 		for _, p := range ws.messagePatterns {
-			if !p.Check(result) {
-				continue
+			for _, c := range p.Check {
+				if !c(result) {
+					continue CHECK_LOOP
+				}
 			}
 			x := p.New()
 			if err = json.Unmarshal(data, x); err != nil {
