@@ -12,7 +12,7 @@ type testSessionHandler struct {
 	done chan struct{}
 
 	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
-	marketTicker, bookTicker bool
+	marketTicker, bookTicker, forceOrder bool
 
 	markPriceCount int
 }
@@ -69,9 +69,16 @@ func (t *testSessionHandler) OnBookTicker(ticker *WsBookTickerEvent) {
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnWsLiquidationOrder(event *WsLiquidationOrderEvent) {
+	// t.Logf("force order event: %#v\n", event)
+	t.forceOrder = true
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || !t.bookTicker || t.markPriceCount < 10 || t.done == nil {
+		!t.marketTicker || !t.bookTicker || !t.forceOrder || t.markPriceCount < 10 ||
+		t.done == nil {
 		return
 	}
 	close(t.done)
@@ -122,14 +129,20 @@ func TestSession(t *testing.T) {
 	if err = session.SubscribeAllMarketTicker(ctx); err != nil {
 		t.Fatal(err)
 	}
-	if err = session.SubscribeBookTicker(ctx, "BTCUSDT", "BNBUSDT"); err != nil {
-		t.Fatal(err)
-	}
 
 	// sleep for a while
 	time.Sleep(time.Second)
 
+	if err = session.SubscribeBookTicker(ctx, "BTCUSDT", "BNBUSDT"); err != nil {
+		t.Fatal(err)
+	}
 	if err = session.SubscribeAllBookTicker(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeLiquidationOrder(ctx, "BTCUSDT"); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeAllLiquidationOrder(ctx); err != nil {
 		t.Fatal(err)
 	}
 
