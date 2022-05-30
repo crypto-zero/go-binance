@@ -76,19 +76,20 @@ func (t *testSessionHandler) OnWsLiquidationOrder(event *WsLiquidationOrderEvent
 }
 
 func (t *testSessionHandler) OnDepth(event *WsDepthEvent) {
-	t.Logf("depth event: %#v\n", event)
+	// t.Logf("depth event: %#v\n", event)
 	t.depth = true
 	t.triggerDone()
 }
 
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || !t.bookTicker || !t.forceOrder || !t.depth ||
+		!t.marketTicker || !t.bookTicker || !t.depth ||
 		t.markPriceCount < 10 || t.done == nil {
 		return
 	}
 	close(t.done)
 	t.done = nil
+	t.Log("handler ok.")
 }
 
 func TestSession(t *testing.T) {
@@ -155,9 +156,11 @@ func TestSession(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	t.Log("waiting ..")
 	if handler.done != nil {
 		<-handler.done
 	}
+	t.Log("wait ok ..")
 
 	cancel()
 	if err = <-errC; err != nil {

@@ -115,7 +115,10 @@ func (s *Session) SubscribeAllLiquidationOrder(ctx context.Context) error {
 func (s *Session) SubscribeDepth(ctx context.Context, symbol string, level int,
 	interval time.Duration,
 ) error {
-	stream := fmt.Sprintf("%s@depth%d", strings.ToLower(symbol), level)
+	stream := fmt.Sprintf("%s@depth", strings.ToLower(symbol))
+	if level > 0 {
+		stream = fmt.Sprintf("%s%d", stream, level)
+	}
 	if interval > 0 {
 		stream = fmt.Sprintf("%s@%s", stream, interval.String())
 	}
