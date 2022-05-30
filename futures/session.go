@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/crypto-zero/go-binance/v2/common"
 )
@@ -24,6 +25,7 @@ type SessionHandler interface {
 	OnMarketTicker(*WsMarketTickerEvent)
 	OnBookTicker(*WsBookTickerEvent)
 	OnWsLiquidationOrder(*WsLiquidationOrderEvent)
+	OnDepth(*WsDepthEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -110,6 +112,16 @@ func (s *Session) SubscribeAllLiquidationOrder(ctx context.Context) error {
 	return s.SubscribeNoReply(ctx, "!forceOrder@arr")
 }
 
+func (s *Session) SubscribeDepth(ctx context.Context, symbol string, level int,
+	interval time.Duration,
+) error {
+	stream := fmt.Sprintf("%s@depth%d", strings.ToLower(symbol), level)
+	if interval > 0 {
+		stream = fmt.Sprintf("%s@%s", stream, interval.String())
+	}
+	return s.SubscribeNoReply(ctx, stream)
+}
+
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
 	handler SessionHandler,
 ) (session *Session, err error) {
@@ -174,6 +186,11 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 		common.WebsocketSessionMessageFactoryBuild[WsLiquidationOrderEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnWsLiquidationOrder),
 		session.RequireMapKeyValue("e", "forceOrder"),
+	)
+	session.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsDepthEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnDepth),
+		session.RequireMapKeyValue("e", "depthUpdate"),
 	)
 	return session, nil
 }

@@ -12,7 +12,7 @@ type testSessionHandler struct {
 	done chan struct{}
 
 	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
-	marketTicker, bookTicker, forceOrder bool
+	marketTicker, bookTicker, forceOrder, depth bool
 
 	markPriceCount int
 }
@@ -75,10 +75,16 @@ func (t *testSessionHandler) OnWsLiquidationOrder(event *WsLiquidationOrderEvent
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnDepth(event *WsDepthEvent) {
+	t.Logf("depth event: %#v\n", event)
+	t.depth = true
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || !t.bookTicker || !t.forceOrder || t.markPriceCount < 10 ||
-		t.done == nil {
+		!t.marketTicker || !t.bookTicker || !t.forceOrder || !t.depth ||
+		t.markPriceCount < 10 || t.done == nil {
 		return
 	}
 	close(t.done)
@@ -143,6 +149,9 @@ func TestSession(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err = session.SubscribeAllLiquidationOrder(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeDepth(ctx, "BTCUSDT", 20, 100*time.Millisecond); err != nil {
 		t.Fatal(err)
 	}
 
