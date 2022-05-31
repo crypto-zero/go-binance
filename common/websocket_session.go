@@ -45,6 +45,11 @@ type WebsocketSession interface {
 	RequireMapKeyValue(key, value string) WebsocketSessionMessageChecker
 }
 
+type MockWebsocketSession interface {
+	WebsocketSession
+	MockProcessMessage(data []byte) error
+}
+
 type WebsocketSessionHandler interface {
 	OnUnknownMessage([]byte, interface{}) error
 	OnClose(err error)
@@ -78,6 +83,13 @@ type websocketSessionMessagePattern struct {
 func NewWebsocketSession(client WebsocketClient, handler WebsocketSessionHandler) WebsocketSession {
 	return &websocketSession{
 		client:          client,
+		handler:         handler,
+		pendingRequests: make(map[uint64]*websocketSessionRequest),
+	}
+}
+
+func NewMockWebsocketSession(handler WebsocketSessionHandler) MockWebsocketSession {
+	return &websocketSession{
 		handler:         handler,
 		pendingRequests: make(map[uint64]*websocketSessionRequest),
 	}
@@ -119,6 +131,10 @@ func (ws *websocketSession) RegisterMessageHandler(factory WebsocketSessionMessa
 		New:      factory,
 		Callback: callback,
 	})
+}
+
+func (ws *websocketSession) MockProcessMessage(data []byte) error {
+	return ws.onMessage(websocket.MessageText, data)
 }
 
 func (ws *websocketSession) onMessage(messageType websocket.MessageType, data []byte) (err error) {

@@ -27,6 +27,7 @@ type SessionHandler interface {
 	OnWsLiquidationOrder(*WsLiquidationOrderEvent)
 	OnDepth(*WsDepthEvent)
 	OnCompositeIndex(*WsCompositeIndexEvent)
+	OnUserData(*WsUserDataEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -134,6 +135,94 @@ func (s *Session) SubscribeCompositeIndex(ctx context.Context, symbol ...string)
 	return s.SubscribeNoReply(ctx, streams...)
 }
 
+func (s *Session) registerHandler(handler SessionHandler) {
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsAggTradeEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnAggTrade),
+		s.RequireMapKeyValue("e", "aggTrade"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsMarkPriceEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnMarkPrice),
+		s.RequireMapKeyValue("e", "markPriceUpdate"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsKlineEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnKline),
+		s.RequireMapKeyValue("e", "kline"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsContinuousKlineEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnContinuousKline),
+		s.RequireMapKeyValue("e", "continuous_kline"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsMiniMarketTickerEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnMiniMarketTicker),
+		s.RequireMapKeyValue("e", "24hrMiniTicker"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsMarketTickerEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnMarketTicker),
+		s.RequireMapKeyValue("e", "24hrTicker"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsBookTickerEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnBookTicker),
+		s.RequireMapKeyValue("e", "bookTicker"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsLiquidationOrderEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnWsLiquidationOrder),
+		s.RequireMapKeyValue("e", "forceOrder"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsDepthEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnDepth),
+		s.RequireMapKeyValue("e", "depthUpdate"),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsCompositeIndexEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnCompositeIndex),
+		s.RequireMapKeyValue("e", "compositeIndex"),
+	)
+
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsUserDataEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnUserData),
+		s.RequireMapKeyValue("e", string(UserDataEventTypeListenKeyExpired)),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsUserDataEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnUserData),
+		s.RequireMapKeyValue("e", string(UserDataEventTypeMarginCall)),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsUserDataEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnUserData),
+		s.RequireMapKeyValue("e", string(UserDataEventTypeAccountUpdate)),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsUserDataEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnUserData),
+		s.RequireMapKeyValue("e", string(UserDataEventTypeOrderTradeUpdate)),
+	)
+	s.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsUserDataEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnUserData),
+		s.RequireMapKeyValue("e", string(UserDataEventTypeAccountConfigUpdate)),
+	)
+}
+
+func newMockSession(handler SessionHandler) (*Session, common.MockWebsocketSession) {
+	wss := common.NewMockWebsocketSession(handler)
+	session := new(Session)
+	session.WebsocketSession = wss
+	session.handler = handler
+	session.registerHandler(handler)
+	return session, wss
+}
+
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
 	handler SessionHandler,
 ) (session *Session, err error) {
@@ -158,56 +247,6 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 	session = new(Session)
 	session.WebsocketSession = common.NewWebsocketSession(cli, handler)
 	session.handler = handler
-
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsAggTradeEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnAggTrade),
-		session.RequireMapKeyValue("e", "aggTrade"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsMarkPriceEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnMarkPrice),
-		session.RequireMapKeyValue("e", "markPriceUpdate"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsKlineEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnKline),
-		session.RequireMapKeyValue("e", "kline"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsContinuousKlineEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnContinuousKline),
-		session.RequireMapKeyValue("e", "continuous_kline"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsMiniMarketTickerEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnMiniMarketTicker),
-		session.RequireMapKeyValue("e", "24hrMiniTicker"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsMarketTickerEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnMarketTicker),
-		session.RequireMapKeyValue("e", "24hrTicker"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsBookTickerEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnBookTicker),
-		session.RequireMapKeyValue("e", "bookTicker"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsLiquidationOrderEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnWsLiquidationOrder),
-		session.RequireMapKeyValue("e", "forceOrder"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsDepthEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnDepth),
-		session.RequireMapKeyValue("e", "depthUpdate"),
-	)
-	session.RegisterMessageHandler(
-		common.WebsocketSessionMessageFactoryBuild[WsCompositeIndexEvent](),
-		common.WebsocketSessionMessageHandlerBuild(handler.OnCompositeIndex),
-		session.RequireMapKeyValue("e", "compositeIndex"),
-	)
+	session.registerHandler(handler)
 	return session, nil
 }

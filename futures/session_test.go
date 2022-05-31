@@ -12,9 +12,15 @@ type testSessionHandler struct {
 	done chan struct{}
 
 	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
-	marketTicker, bookTicker, forceOrder, depth, compositeIndex bool
+	marketTicker, bookTicker, forceOrder, depth, compositeIndex, userData bool
+	userDataMarginCall, userDataAccountUpdate, userDataOrderUpdate,
+	userDataConfigUpdated, userDataLicenseKeyExpired bool
 
 	markPriceCount int
+}
+
+func newTestSessionHandler(t *testing.T) *testSessionHandler {
+	return &testSessionHandler{T: t, done: make(chan struct{})}
 }
 
 func (t *testSessionHandler) OnUnknownMessage(bytes []byte, i interface{}) error {
@@ -27,7 +33,6 @@ func (t *testSessionHandler) OnClose(err error) {
 }
 
 func (t *testSessionHandler) OnAggTrade(event *WsAggTradeEvent) {
-	// t.Logf("got agg trade event: %#v\n", event)
 	t.aggTrade = true
 	t.triggerDone()
 }
@@ -87,6 +92,24 @@ func (t *testSessionHandler) OnCompositeIndex(event *WsCompositeIndexEvent) {
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnUserData(event *WsUserDataEvent) {
+	// t.Logf("user data event: %#v\n", event)
+	t.userData = true
+	switch event.Event {
+	case UserDataEventTypeListenKeyExpired:
+		t.userDataLicenseKeyExpired = true
+	case UserDataEventTypeAccountUpdate:
+		t.userDataAccountUpdate = true
+	case UserDataEventTypeAccountConfigUpdate:
+		t.userDataConfigUpdated = true
+	case UserDataEventTypeOrderTradeUpdate:
+		t.userDataOrderUpdate = true
+	case UserDataEventTypeMarginCall:
+		t.userDataMarginCall = true
+	}
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
 		!t.marketTicker || !t.bookTicker || !t.depth || !t.compositeIndex ||
@@ -104,7 +127,7 @@ func TestSession(t *testing.T) {
 		return
 	}
 
-	handler := &testSessionHandler{T: t, done: make(chan struct{})}
+	handler := newTestSessionHandler(t)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	session, err := NewSession(ctx, false, "", nil, handler)
@@ -174,5 +197,31 @@ func TestSession(t *testing.T) {
 	cancel()
 	if err = <-errC; err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestMockSession(t *testing.T) {
+	handler := newTestSessionHandler(t)
+	session, wss := newMockSession(handler)
+
+	messages := []string{
+		`{"e":"listenKeyExpired","E":1576653824250}`,
+		`{"e":"MARGIN_CALL","E":1587727187525,"cw":"3.16812045","p":[{"s":"ETHUSDT","ps":"LONG","pa":"1.327","mt":"CROSSED","iw":"0","mp":"187.17127","up":"-1.166074","mm":"1.614445"}]}`,
+		`{"e":"ACCOUNT_UPDATE","E":1564745798939,"T":1564745798938,"a":{"m":"ORDER","B":[{"a":"USDT","wb":"122624.12345678","cw":"100.12345678","bc":"50.12345678"},{"a":"BUSD","wb":"1.00000000","cw":"0.00000000","bc":"-49.12345678"}],"P":[{"s":"BTCUSDT","pa":"0","ep":"0.00000","cr":"200","up":"0","mt":"isolated","iw":"0.00000000","ps":"BOTH"},{"s":"BTCUSDT","pa":"20","ep":"6563.66500","cr":"0","up":"2850.21200","mt":"isolated","iw":"13200.70726908","ps":"LONG"},{"s":"BTCUSDT","pa":"-10","ep":"6563.86000","cr":"-45.04000000","up":"-1423.15600","mt":"isolated","iw":"6570.42511771","ps":"SHORT"}]}}`,
+		`{"e":"ORDER_TRADE_UPDATE","E":1568879465651,"T":1568879465650,"o":{"s":"BTCUSDT","c":"TEST","S":"SELL","o":"TRAILING_STOP_MARKET","f":"GTC","q":"0.001","p":"0","ap":"0","sp":"7103.04","x":"NEW","X":"NEW","i":8886774,"l":"0","z":"0","L":"0","N":"USDT","n":"0","T":1568879465651,"t":0,"b":"0","a":"9.91","m":false,"R":false,"wt":"CONTRACT_PRICE","ot":"TRAILING_STOP_MARKET","ps":"LONG","cp":false,"AP":"7476.89","cr":"5.0","pP":false,"si":0,"ss":0,"rp":"0"}}
+`,
+		`{"e":"ACCOUNT_CONFIG_UPDATE","E":1611646737479,"T":1611646737476,"ac":{"s":"BTCUSDT","l":25}}`,
+		`{"e":"ACCOUNT_CONFIG_UPDATE","E":1611646737479,"T":1611646737476,"ai":{"j":true}}`,
+	}
+
+	for _, msg := range messages {
+		if err := wss.MockProcessMessage([]byte(msg)); err != nil {
+			t.Fatal(err, msg)
+		}
+	}
+	t.Log(session)
+	if !handler.userData || !handler.userDataLicenseKeyExpired || !handler.userDataAccountUpdate ||
+		!handler.userDataOrderUpdate || !handler.userDataConfigUpdated || !handler.userDataMarginCall {
+		t.Fatal("handler did not get user events")
 	}
 }
