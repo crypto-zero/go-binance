@@ -579,15 +579,17 @@ type WsCompositeIndexEvent struct {
 	Event       string          `json:"e"`
 	Time        int64           `json:"E"`
 	Symbol      string          `json:"s"`
-	Price       string          `json:"p"`
+	Price       float64         `json:"p,string"`
+	Type        string          `json:"C"`
 	Composition []WsComposition `json:"c"`
 }
 
 // WsComposition websocket composite index event composition
 type WsComposition struct {
-	BaseAsset    string `json:"b"`
-	WeightQty    string `json:"w"`
-	WeighPercent string `json:"W"`
+	BaseAsset    string  `json:"b"`
+	QuoteAsset   string  `json:"q"`
+	WeightQty    float64 `json:"w,string"`
+	WeighPercent float64 `json:"W,string"`
 }
 
 // WsCompositeIndexHandler websocket composite index handler

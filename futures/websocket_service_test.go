@@ -1023,17 +1023,17 @@ func (s *websocketServiceTestSuite) TestWsCompositiveIndexServe() {
 			Event:  "compositeIndex",
 			Time:   1602310596000,
 			Symbol: "DEFIUSDT",
-			Price:  "554.41604065",
+			Price:  554.41604065,
 			Composition: []WsComposition{
 				{
 					BaseAsset:    "BAL",
-					WeightQty:    "1.35038833",
-					WeighPercent: "0.03957100",
+					WeightQty:    1.35038833,
+					WeighPercent: 0.03957100,
 				},
 				{
 					BaseAsset:    "BAND",
-					WeightQty:    "3.53782729",
-					WeighPercent: "0.03935200",
+					WeightQty:    3.53782729,
+					WeighPercent: 0.03935200,
 				},
 			},
 		}

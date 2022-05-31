@@ -12,7 +12,7 @@ type testSessionHandler struct {
 	done chan struct{}
 
 	aggTrade, markPrice, kline, continuousKline, miniMarketTicker,
-	marketTicker, bookTicker, forceOrder, depth bool
+	marketTicker, bookTicker, forceOrder, depth, compositeIndex bool
 
 	markPriceCount int
 }
@@ -81,9 +81,15 @@ func (t *testSessionHandler) OnDepth(event *WsDepthEvent) {
 	t.triggerDone()
 }
 
+func (t *testSessionHandler) OnCompositeIndex(event *WsCompositeIndexEvent) {
+	// t.Logf("composite index event: %#v\n", event)
+	t.compositeIndex = true
+	t.triggerDone()
+}
+
 func (t *testSessionHandler) triggerDone() {
 	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || !t.bookTicker || !t.depth ||
+		!t.marketTicker || !t.bookTicker || !t.depth || !t.compositeIndex ||
 		t.markPriceCount < 10 || t.done == nil {
 		return
 	}
@@ -153,6 +159,9 @@ func TestSession(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err = session.SubscribeDepth(ctx, "BTCUSDT", 20, 100*time.Millisecond); err != nil {
+		t.Fatal(err)
+	}
+	if err = session.SubscribeCompositeIndex(ctx, "DEFIUSDT"); err != nil {
 		t.Fatal(err)
 	}
 

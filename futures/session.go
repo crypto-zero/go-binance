@@ -26,6 +26,7 @@ type SessionHandler interface {
 	OnBookTicker(*WsBookTickerEvent)
 	OnWsLiquidationOrder(*WsLiquidationOrderEvent)
 	OnDepth(*WsDepthEvent)
+	OnCompositeIndex(*WsCompositeIndexEvent)
 }
 
 func (s *Session) SubscribeAggTrade(ctx context.Context, symbol ...string) (err error) {
@@ -125,6 +126,14 @@ func (s *Session) SubscribeDepth(ctx context.Context, symbol string, level int,
 	return s.SubscribeNoReply(ctx, stream)
 }
 
+func (s *Session) SubscribeCompositeIndex(ctx context.Context, symbol ...string) error {
+	var streams []string
+	for _, s := range symbol {
+		streams = append(streams, fmt.Sprintf("%s@compositeIndex", strings.ToLower(s)))
+	}
+	return s.SubscribeNoReply(ctx, streams...)
+}
+
 func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *url.URL,
 	handler SessionHandler,
 ) (session *Session, err error) {
@@ -194,6 +203,11 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 		common.WebsocketSessionMessageFactoryBuild[WsDepthEvent](),
 		common.WebsocketSessionMessageHandlerBuild(handler.OnDepth),
 		session.RequireMapKeyValue("e", "depthUpdate"),
+	)
+	session.RegisterMessageHandler(
+		common.WebsocketSessionMessageFactoryBuild[WsCompositeIndexEvent](),
+		common.WebsocketSessionMessageHandlerBuild(handler.OnCompositeIndex),
+		session.RequireMapKeyValue("e", "compositeIndex"),
 	)
 	return session, nil
 }
