@@ -105,6 +105,7 @@ func (c *client) prepareRequest(r *Request, opts ...RequestOption) (bodyString,
 			return "", "", nil, err
 		}
 		signature := fmt.Sprintf("%x", mac.Sum(nil))
+		// NOTE: The signature pair MUST be appended to the last of query string.
 		if queryString != "" {
 			queryString += "&"
 		}
