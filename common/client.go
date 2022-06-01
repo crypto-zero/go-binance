@@ -105,8 +105,10 @@ func (c *client) prepareRequest(r *Request, opts ...RequestOption) (bodyString,
 			return "", "", nil, err
 		}
 		signature := fmt.Sprintf("%x", mac.Sum(nil))
-		r.Query.Set(signatureKey, signature)
-		queryString = r.Query.Encode()
+		if queryString != "" {
+			queryString += "&"
+		}
+		queryString = fmt.Sprintf("%s%s=%s", queryString, signatureKey, signature)
 	}
 
 	fURL.RawQuery = queryString

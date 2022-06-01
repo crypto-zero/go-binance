@@ -3,6 +3,7 @@ package futures
 import (
 	"context"
 	"os"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -15,6 +16,7 @@ type testSessionHandler struct {
 	marketTicker, bookTicker, forceOrder, depth, compositeIndex, userData bool
 	userDataMarginCall, userDataAccountUpdate, userDataOrderUpdate,
 	userDataConfigUpdated, userDataLicenseKeyExpired bool
+	doneWhenUserData bool
 
 	markPriceCount int
 }
@@ -93,7 +95,7 @@ func (t *testSessionHandler) OnCompositeIndex(event *WsCompositeIndexEvent) {
 }
 
 func (t *testSessionHandler) OnUserData(event *WsUserDataEvent) {
-	// t.Logf("user data event: %#v\n", event)
+	t.Logf("user data event: %#v\n", event)
 	t.userData = true
 	switch event.Event {
 	case UserDataEventTypeListenKeyExpired:
@@ -111,10 +113,19 @@ func (t *testSessionHandler) OnUserData(event *WsUserDataEvent) {
 }
 
 func (t *testSessionHandler) triggerDone() {
-	if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline || !t.miniMarketTicker ||
-		!t.marketTicker || !t.bookTicker || !t.depth || !t.compositeIndex ||
-		t.markPriceCount < 10 || t.done == nil {
+	if t.done == nil {
 		return
+	}
+	if !t.doneWhenUserData {
+		if !t.aggTrade || !t.markPrice || !t.kline || !t.continuousKline ||
+			!t.miniMarketTicker || !t.marketTicker || !t.bookTicker || !t.depth ||
+			!t.compositeIndex || t.markPriceCount < 10 {
+			return
+		}
+	} else {
+		if !t.userData || !t.userDataOrderUpdate || !t.userDataConfigUpdated {
+			return
+		}
 	}
 	close(t.done)
 	t.done = nil
@@ -224,4 +235,74 @@ func TestMockSession(t *testing.T) {
 		!handler.userDataOrderUpdate || !handler.userDataConfigUpdated || !handler.userDataMarginCall {
 		t.Fatal("handler did not get user events")
 	}
+}
+
+func TestUserData(t *testing.T) {
+	key, secret := os.Getenv("TEST_SESSION_KEY"), os.Getenv("TEST_SESSION_SECRET")
+	if key == "" || secret == "" {
+		t.Skip("skip test user data")
+		return
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	handler := newTestSessionHandler(t)
+	handler.doneWhenUserData = true
+
+	c := NewClient(key, secret, false)
+	s := c.NewStartUserStreamService()
+	rsp, err := s.Do(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	session, err := NewSession(ctx, false, rsp, nil, handler)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	loopC := session.RunLoop()
+
+	symbol := "EOSUSDT"
+	leverage := 0
+
+	accountReply, err := c.NewGetAccountService().Do(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, p := range accountReply.Positions {
+		if p.Symbol == symbol {
+			if leverage, err = strconv.Atoi(p.Leverage); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	if leverage >= 50 {
+		leverage = 30
+	} else if leverage >= 10 && leverage < 50 {
+		leverage++
+	}
+	t.Log(leverage)
+
+	// do operations
+	if _, err = c.NewChangeLeverageService().Symbol(symbol).Leverage(leverage).Do(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	reply, err := c.NewCreateOrderService().Symbol(symbol).Side(SideTypeBuy).Price("0.5").
+		Quantity("10").Type(OrderTypeLimit).TimeInForce(TimeInForceTypeGTC).Do(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(reply.OrderID)
+
+	if _, err = c.NewCancelOrderService().Symbol(symbol).OrderID(reply.OrderID).Do(ctx); err != nil {
+		t.Log(err)
+	}
+
+	if handler.done != nil {
+		<-handler.done
+	}
+	cancel()
+	<-loopC
 }
