@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 // Endpoints
@@ -171,6 +173,15 @@ type WsKlineEvent struct {
 	Time   int64   `json:"E"`
 	Symbol string  `json:"s"`
 	Kline  WsKline `json:"k"`
+}
+
+// WsContinuousKlineEvent define websocket continuous kline event
+type WsContinuousKlineEvent struct {
+	Event        string  `json:"e"`
+	Time         int64   `json:"E"`
+	BaseSymbol   string  `json:"ps"`
+	ContractType string  `json:"ct"`
+	Kline        WsKline `json:"k"`
 }
 
 // WsKline define websocket kline
@@ -471,145 +482,15 @@ func WsAllLiquidationOrderServe(handler WsLiquidationOrderHandler, errHandler Er
 
 // WsDepthEvent define websocket depth book event
 type WsDepthEvent struct {
-	Event            string `json:"e"`
-	Time             int64  `json:"E"`
-	TransactionTime  int64  `json:"T"`
-	Symbol           string `json:"s"`
-	FirstUpdateID    int64  `json:"U"`
-	LastUpdateID     int64  `json:"u"`
-	PrevLastUpdateID int64  `json:"pu"`
-	Bids             []Bid  `json:"b"`
-	Asks             []Ask  `json:"a"`
-}
-
-// WsDepthHandler handle websocket depth event
-type WsDepthHandler func(event *WsDepthEvent)
-
-func wsPartialDepthServe(symbol string, levels int, rate *time.Duration, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	if levels != 5 && levels != 10 && levels != 20 {
-		return nil, nil, errors.New("Invalid levels")
-	}
-	levelsStr := fmt.Sprintf("%d", levels)
-	return wsDepthServe(symbol, levelsStr, rate, handler, errHandler)
-}
-
-// WsPartialDepthServe serve websocket partial depth handler.
-func WsPartialDepthServe(symbol string, levels int, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	return wsPartialDepthServe(symbol, levels, nil, handler, errHandler)
-}
-
-// WsPartialDepthServeWithRate serve websocket partial depth handler with rate.
-func WsPartialDepthServeWithRate(symbol string, levels int, rate time.Duration, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	return wsPartialDepthServe(symbol, levels, &rate, handler, errHandler)
-}
-
-// WsDiffDepthServe serve websocket diff. depth handler.
-func WsDiffDepthServe(symbol string, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	return wsDepthServe(symbol, "", nil, handler, errHandler)
-}
-
-// WsCombinedDepthServe is similar to WsPartialDepthServe, but it for multiple symbols
-func WsCombinedDepthServe(symbolLevels map[string]string, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	endpoint := getCombinedEndpoint()
-	for s, l := range symbolLevels {
-		endpoint += fmt.Sprintf("%s@depth%s", strings.ToLower(s), l) + "/"
-	}
-	endpoint = endpoint[:len(endpoint)-1]
-	cfg := newWsConfig(endpoint)
-	wsHandler := func(message []byte) {
-		j, err := newJSON(message)
-		if err != nil {
-			errHandler(err)
-			return
-		}
-		event := new(WsDepthEvent)
-		data := j.Get("data").MustMap()
-		event.Event = data["e"].(string)
-		event.Time, _ = data["E"].(json.Number).Int64()
-		event.TransactionTime, _ = data["T"].(json.Number).Int64()
-		event.Symbol = data["s"].(string)
-		event.FirstUpdateID, _ = data["U"].(json.Number).Int64()
-		event.LastUpdateID, _ = data["u"].(json.Number).Int64()
-		event.PrevLastUpdateID, _ = data["pu"].(json.Number).Int64()
-		bidsLen := len(data["b"].([]interface{}))
-		event.Bids = make([]Bid, bidsLen)
-		for i := 0; i < bidsLen; i++ {
-			item := data["b"].([]interface{})[i].([]interface{})
-			event.Bids[i] = Bid{
-				Price:    item[0].(string),
-				Quantity: item[1].(string),
-			}
-		}
-		asksLen := len(data["a"].([]interface{}))
-		event.Asks = make([]Ask, asksLen)
-		for i := 0; i < asksLen; i++ {
-			item := data["a"].([]interface{})[i].([]interface{})
-			event.Asks[i] = Ask{
-				Price:    item[0].(string),
-				Quantity: item[1].(string),
-			}
-		}
-		handler(event)
-	}
-	return wsServe(cfg, wsHandler, errHandler)
-}
-
-// WsDiffDepthServeWithRate serve websocket diff. depth handler with rate.
-func WsDiffDepthServeWithRate(symbol string, rate time.Duration, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	return wsDepthServe(symbol, "", &rate, handler, errHandler)
-}
-
-func wsDepthServe(symbol string, levels string, rate *time.Duration, handler WsDepthHandler, errHandler ErrHandler) (doneC, stopC chan struct{}, err error) {
-	var rateStr string
-	if rate != nil {
-		switch *rate {
-		case 250 * time.Millisecond:
-			rateStr = ""
-		case 500 * time.Millisecond:
-			rateStr = "@500ms"
-		case 100 * time.Millisecond:
-			rateStr = "@100ms"
-		default:
-			return nil, nil, errors.New("Invalid rate")
-		}
-	}
-	endpoint := fmt.Sprintf("%s/%s@depth%s%s", getWsEndpoint(), strings.ToLower(symbol), levels, rateStr)
-	cfg := newWsConfig(endpoint)
-	wsHandler := func(message []byte) {
-		j, err := newJSON(message)
-		if err != nil {
-			errHandler(err)
-			return
-		}
-		event := new(WsDepthEvent)
-		event.Event = j.Get("e").MustString()
-		event.Time = j.Get("E").MustInt64()
-		event.TransactionTime = j.Get("T").MustInt64()
-		event.Symbol = j.Get("s").MustString()
-		event.FirstUpdateID = j.Get("U").MustInt64()
-		event.LastUpdateID = j.Get("u").MustInt64()
-		event.PrevLastUpdateID = j.Get("pu").MustInt64()
-		bidsLen := len(j.Get("b").MustArray())
-		event.Bids = make([]Bid, bidsLen)
-		for i := 0; i < bidsLen; i++ {
-			item := j.Get("b").GetIndex(i)
-			event.Bids[i] = Bid{
-				Price:    item.GetIndex(0).MustString(),
-				Quantity: item.GetIndex(1).MustString(),
-			}
-		}
-		asksLen := len(j.Get("a").MustArray())
-		event.Asks = make([]Ask, asksLen)
-		for i := 0; i < asksLen; i++ {
-			item := j.Get("a").GetIndex(i)
-			event.Asks[i] = Ask{
-				Price:    item.GetIndex(0).MustString(),
-				Quantity: item.GetIndex(1).MustString(),
-			}
-		}
-		handler(event)
-	}
-	return wsServe(cfg, wsHandler, errHandler)
+	Event            string                   `json:"e"`
+	Time             int64                    `json:"E"`
+	TransactionTime  int64                    `json:"T"`
+	Symbol           string                   `json:"s"`
+	FirstUpdateID    int64                    `json:"U"`
+	LastUpdateID     int64                    `json:"u"`
+	PrevLastUpdateID int64                    `json:"pu"`
+	Bids             []common.PriceLevelArray `json:"b"`
+	Asks             []common.PriceLevelArray `json:"a"`
 }
 
 // WsBLVTInfoEvent define websocket BLVT info event
@@ -698,15 +579,17 @@ type WsCompositeIndexEvent struct {
 	Event       string          `json:"e"`
 	Time        int64           `json:"E"`
 	Symbol      string          `json:"s"`
-	Price       string          `json:"p"`
+	Price       float64         `json:"p,string"`
+	Type        string          `json:"C"`
 	Composition []WsComposition `json:"c"`
 }
 
 // WsComposition websocket composite index event composition
 type WsComposition struct {
-	BaseAsset    string `json:"b"`
-	WeightQty    string `json:"w"`
-	WeighPercent string `json:"W"`
+	BaseAsset    string  `json:"b"`
+	QuoteAsset   string  `json:"q"`
+	WeightQty    float64 `json:"w,string"`
+	WeighPercent float64 `json:"W,string"`
 }
 
 // WsCompositeIndexHandler websocket composite index handler

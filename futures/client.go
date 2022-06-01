@@ -62,6 +62,9 @@ type UserDataEventReasonType string
 // ForceOrderCloseType define reason type for force order
 type ForceOrderCloseType string
 
+// KlineInterval define valid kline interval
+type KlineInterval string
+
 // Endpoints
 const (
 	baseApiMainUrl    = "https://fapi.binance.com"
@@ -138,7 +141,9 @@ const (
 	MarginTypeIsolated MarginType = "ISOLATED"
 	MarginTypeCrossed  MarginType = "CROSSED"
 
-	ContractTypePerpetual ContractType = "PERPETUAL"
+	ContractTypePerpetual      ContractType = "PERPETUAL"
+	ContractTypeCurrentQuarter ContractType = "CURRENT_QUARTER"
+	ContractTypeNextQuarter    ContractType = "NEXT_QUARTER"
 
 	UserDataEventTypeListenKeyExpired    UserDataEventType = "listenKeyExpired"
 	UserDataEventTypeMarginCall          UserDataEventType = "MARGIN_CALL"
@@ -163,6 +168,22 @@ const (
 
 	ForceOrderCloseTypeLiquidation ForceOrderCloseType = "LIQUIDATION"
 	ForceOrderCloseTypeADL         ForceOrderCloseType = "ADL"
+
+	KlineInterval1Minute  KlineInterval = "1m"
+	KlineInterval3Minute  KlineInterval = "3m"
+	KlineInterval5Minute  KlineInterval = "5m"
+	KlineInterval15Minute KlineInterval = "15m"
+	KlineInterval30Minute KlineInterval = "30m"
+	KlineInterval1Hour    KlineInterval = "1h"
+	KlineInterval2Hour    KlineInterval = "2h"
+	KlineInterval4Hour    KlineInterval = "4h"
+	KlineInterval6Hour    KlineInterval = "6h"
+	KlineInterval8Hour    KlineInterval = "8h"
+	KlineInterval12Hour   KlineInterval = "12h"
+	KlineInterval1Day     KlineInterval = "1d"
+	KlineInterval3Day     KlineInterval = "3d"
+	KlineInterval1Week    KlineInterval = "1w"
+	KlineInterval1Month   KlineInterval = "1M"
 
 	timestampKey  = "timestamp"
 	signatureKey  = "signature"
