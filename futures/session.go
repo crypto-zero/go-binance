@@ -50,8 +50,12 @@ func (s *Session) SubscribeAllMarkPrice(ctx context.Context) error {
 	return s.SubscribeNoReply(ctx, "!markPrice@arr@1s")
 }
 
+func (s *Session) KlineStreamName(symbol string, interval KlineInterval) string {
+	return fmt.Sprintf("%s@kline_%s", strings.ToLower(symbol), strings.ToLower(string(interval)))
+}
+
 func (s *Session) SubscribeKline(ctx context.Context, symbol string, interval KlineInterval) error {
-	return s.SubscribeNoReply(ctx, fmt.Sprintf("%s@kline_%s", strings.ToLower(symbol), interval))
+	return s.SubscribeNoReply(ctx, s.KlineStreamName(symbol, interval))
 }
 
 func (s *Session) SubscribeContinuousKline(ctx context.Context, symbol string,
