@@ -129,11 +129,11 @@ func (c *client) CallAPIBytes(ctx context.Context, r *Request, opts ...RequestOp
 	if body != "" {
 		inBody = bytes.NewBufferString(body)
 	}
-	req, err := http.NewRequest(r.Method, fullURL, inBody)
+
+	req, err := http.NewRequestWithContext(ctx, r.Method, fullURL, inBody)
 	if err != nil {
 		return nil, err
 	}
-	req = req.WithContext(ctx)
 	req.Header = headers
 
 	c.logger.Debugw("call api prepare", "id", r.ID, "url", fullURL, "body", body)
