@@ -133,7 +133,14 @@ type WebsocketClient interface {
 func WebsocketDial(ctx context.Context, url string, httpClient *http.Client) (
 	out WebsocketClient, err error,
 ) {
-	opts := &websocket.DialOptions{HTTPClient: httpClient}
+	// disable compression for
+	// failed to WebSocket dial: unsupported permessage-deflate parameter: "server_max_window_bits=15"
+	// pull request ref: https://github.com/nhooyr/websocket/pull/258
+	// issue ref: https://github.com/nhooyr/websocket/issues/351
+	opts := &websocket.DialOptions{
+		HTTPClient:      httpClient,
+		CompressionMode: websocket.CompressionDisabled,
+	}
 	conn, _, err := websocket.Dial(ctx, url, opts)
 	if err != nil {
 		return nil, err
