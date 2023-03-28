@@ -38,7 +38,7 @@ func TestWebsocketSession(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	urlAddress := "wss://fstream.binance.com/ws"
 
-	cli, err := WebsocketDial(ctx, urlAddress, nil)
+	cli, err := DefaultWebsocketProvider(ctx, urlAddress, nil)
 	if err != nil {
 		t.Fatal(err)
 		return

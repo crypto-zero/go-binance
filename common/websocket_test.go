@@ -5,8 +5,6 @@ import (
 	"os"
 	"sync"
 	"testing"
-
-	"nhooyr.io/websocket"
 )
 
 func TestWebsocketConnection(t *testing.T) {
@@ -18,7 +16,7 @@ func TestWebsocketConnection(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	url := "wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self"
 
-	cli, err := WebsocketDial(ctx, url, nil)
+	cli, err := NhooyrWebsocketDial(ctx, url, nil)
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -26,7 +24,7 @@ func TestWebsocketConnection(t *testing.T) {
 
 	done := make(chan struct{}, 2)
 
-	f := func(mt websocket.MessageType, data []byte) error {
+	f := func(data []byte) error {
 		t.Logf("ws client got message: %s\n", string(data))
 		done <- struct{}{}
 		return nil

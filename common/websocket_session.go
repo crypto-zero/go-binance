@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"sync"
 	"sync/atomic"
-
-	"nhooyr.io/websocket"
 )
 
 type websocketSession struct {
@@ -134,10 +132,10 @@ func (ws *websocketSession) RegisterMessageHandler(factory WebsocketSessionMessa
 }
 
 func (ws *websocketSession) MockProcessMessage(data []byte) error {
-	return ws.onMessage(websocket.MessageText, data)
+	return ws.onMessage(data)
 }
 
-func (ws *websocketSession) onMessage(messageType websocket.MessageType, data []byte) (err error) {
+func (ws *websocketSession) onMessage(data []byte) (err error) {
 	defer func() {
 		if err == nil {
 			return

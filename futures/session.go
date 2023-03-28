@@ -238,12 +238,7 @@ func NewSession(ctx context.Context, testnet bool, listenKey string, proxyURL *u
 		address = fmt.Sprintf("%s/%s", address, listenKey)
 	}
 
-	var cli common.WebsocketClient
-	if proxyURL == nil {
-		cli, err = common.WebsocketDial(ctx, address, nil)
-	} else {
-		cli, err = common.WebsocketDialProxy(ctx, address, proxyURL)
-	}
+	cli, err := common.DefaultWebsocketProvider(ctx, address, proxyURL)
 	if err != nil {
 		return nil, err
 	}
