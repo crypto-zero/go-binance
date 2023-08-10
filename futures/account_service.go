@@ -40,7 +40,7 @@ type GetAccountService struct {
 
 // Do send request
 func (s *GetAccountService) Do(ctx context.Context, opts ...common.RequestOption) (res *Account, err error) {
-	r := common.NewGetRequestSigned("/fapi/v1/account")
+	r := common.NewGetRequestSigned("/fapi/v2/account")
 
 	res = new(Account)
 	if err = s.c.CallAPI(ctx, r, res, opts...); err != nil {
@@ -56,6 +56,7 @@ type Account struct {
 	CanTrade                    bool               `json:"canTrade"`
 	CanWithdraw                 bool               `json:"canWithdraw"`
 	FeeTier                     int                `json:"feeTier"`
+	MultiAssetsMargin           bool               `json:"multiAssetsMargin"`
 	MaxWithdrawAmount           string             `json:"maxWithdrawAmount"`
 	Positions                   []*AccountPosition `json:"positions"`
 	TotalInitialMargin          string             `json:"totalInitialMargin"`
@@ -65,6 +66,9 @@ type Account struct {
 	TotalPositionInitialMargin  string             `json:"totalPositionInitialMargin"`
 	TotalUnrealizedProfit       string             `json:"totalUnrealizedProfit"`
 	TotalWalletBalance          string             `json:"totalWalletBalance"`
+	TotalCrossWalletBalance     string             `json:"totalCrossWalletBalance"` // 全仓账户余额, 仅计算 USDT 资产
+	TotalCrossUnrealizedProfit  string             `json:"totalCrossUnPnl"`         // 全仓持仓未实现盈亏总额, 仅计算 USDT 资产
+	AvailableBalance            string             `json:"availableBalance"`        // 可用余额, 仅计算 USDT 资产
 	UpdateTime                  int64              `json:"updateTime"`
 }
 
@@ -79,6 +83,11 @@ type AccountAsset struct {
 	PositionInitialMargin  string `json:"positionInitialMargin"`
 	UnrealizedProfit       string `json:"unrealizedProfit"`
 	WalletBalance          string `json:"walletBalance"`
+	CrossWalletBalance     string `json:"crossWalletBalance"` // 全仓账户余额
+	CrossUnrealizedProfit  string `json:"crossUnPnl"`         // 全仓持仓未实现盈亏
+	AvailableBalance       string `json:"availableBalance"`   // 可用余额
+	MarginAvailable        bool   `json:"marginAvailable"`    // 是否可用作联合保证金
+	UpdateTime             int64  `json:"updateTime"`         // 更新时间
 }
 
 // AccountPosition define account position
@@ -93,9 +102,11 @@ type AccountPosition struct {
 	UnrealizedProfit       string           `json:"unrealizedProfit"`
 	EntryPrice             string           `json:"entryPrice"`
 	MaxNotional            string           `json:"maxNotional"`
+	BidNotional            string           `json:"bidNotional"` // 买单净值，忽略
+	AskNotional            string           `json:"askNotional"` // 卖单净值，忽略
 	PositionSide           PositionSideType `json:"positionSide"`
 	PositionAmt            string           `json:"positionAmt"`
 	Notional               string           `json:"notional"`
 	IsolatedWallet         string           `json:"isolatedWallet"`
-	UpdateTime             int64            `json:"updateTime"`
+	UpdateTime             int64            `json:"updateTime"` // 更新时间
 }

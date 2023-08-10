@@ -1,11 +1,15 @@
 package futures
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"os"
 	"testing"
 
-	"github.com/crypto-zero/go-binance/v2/common"
-
 	"github.com/stretchr/testify/suite"
+
+	"github.com/crypto-zero/go-binance/v2/common"
 )
 
 type accountServiceTestSuite struct {
@@ -14,6 +18,24 @@ type accountServiceTestSuite struct {
 
 func TestAccountService(t *testing.T) {
 	suite.Run(t, new(accountServiceTestSuite))
+}
+
+func TestGetAccount(t *testing.T) {
+	key, secret := os.Getenv("KEY"), os.Getenv("SECRET")
+	if key == "" || secret == "" {
+		t.Skip("KEY and SECRET must be set")
+		return
+	}
+	c := NewClient(key, secret, false).NewGetAccountService()
+	reply, err := c.Do(context.Background())
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	d, _ := json.Marshal(reply)
+	var out bytes.Buffer
+	_ = json.Indent(&out, d, "", "\t")
+	_, _ = out.WriteTo(os.Stdout)
 }
 
 func (s *accountServiceTestSuite) TestGetBalance() {
