@@ -57,6 +57,7 @@ type Account struct {
 	CanWithdraw                 bool               `json:"canWithdraw"`
 	FeeTier                     int                `json:"feeTier"`
 	MultiAssetsMargin           bool               `json:"multiAssetsMargin"`
+	TradeGroupID                int64              `json:"tradeGroupId"`
 	MaxWithdrawAmount           string             `json:"maxWithdrawAmount"`
 	Positions                   []*AccountPosition `json:"positions"`
 	TotalInitialMargin          string             `json:"totalInitialMargin"`
